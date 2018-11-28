@@ -226,53 +226,63 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
     g_vertex_color_dataA[i]  = 0.654321;
 	g_vertex_normal_dataA[i] = 0.0f;
   }
-
+  float couleur = 0;
   for (int i=0; i<N-1; i++){
-	g_vertex_buffer_dataA[18*i + 0] = i;
-	g_vertex_buffer_dataA[18*i + 1] = vecVals[i];
-	g_vertex_buffer_dataA[18*i + 2] = 0.0f+profondeur_A;
+	if (vecVals[i] < 0.5)
+		couleur = 0.0f;
+	else if (vecVals[i] < 0.8)
+		couleur = 0.5f;
+	else 
+		couleur = 1.0f;
+	float distance = i/2000.0;
+float distance1 = (i+1)/2000.0;
 
-	g_vertex_buffer_dataA[18*i + 3] = i;
-	g_vertex_buffer_dataA[18*i + 4] = vecVals[i];
-	g_vertex_buffer_dataA[18*i + 5] = 1.0f+profondeur_A;
+	cout << distance<< endl;
+	g_vertex_buffer_dataA[18*i + 0] = distance;
+	g_vertex_buffer_dataA[18*i + 1] = 0.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 2] = vecVals[i];
 
-	g_vertex_buffer_dataA[18*i + 6] = i+1;
-	g_vertex_buffer_dataA[18*i + 7] = vecVals[i+1];
-	g_vertex_buffer_dataA[18*i + 8] = 0.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 3] = distance;
+	g_vertex_buffer_dataA[18*i + 4] = 1.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 5] = vecVals[i];
 
-	g_vertex_buffer_dataA[18*i + 9] = i;
-	g_vertex_buffer_dataA[18*i + 10] = vecVals[i];
-	g_vertex_buffer_dataA[18*i + 11] = 1.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 6] = distance1;
+	g_vertex_buffer_dataA[18*i + 7] = 0.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 8] = vecVals[i+1];
 
-	g_vertex_buffer_dataA[18*i + 12] = i+1;
-	g_vertex_buffer_dataA[18*i + 13] = vecVals[i+1];
-	g_vertex_buffer_dataA[18*i + 14] = 0.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 9] = distance;
+	g_vertex_buffer_dataA[18*i + 10] = 1.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 11] = vecVals[i];
 
-	g_vertex_buffer_dataA[18*i + 15] = i+1;
-	g_vertex_buffer_dataA[18*i + 16] = vecVals[i+1];
-	g_vertex_buffer_dataA[18*i + 17] = 1.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 12] = distance1;
+	g_vertex_buffer_dataA[18*i + 13] = 0.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 14] = vecVals[i+1];
 
-	g_vertex_color_dataA[18*i + 0] = 1.0f;
+	g_vertex_buffer_dataA[18*i + 15] = distance1;
+	g_vertex_buffer_dataA[18*i + 16] = 1.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 17] = vecVals[i+1];
+
+	g_vertex_color_dataA[18*i + 0] = couleur;
 	g_vertex_color_dataA[18*i + 1] = 0.0f;
 	g_vertex_color_dataA[18*i + 2] = 0.0f;
 
-	g_vertex_color_dataA[18*i + 3] = 1.0f;
+	g_vertex_color_dataA[18*i + 3] = couleur;
 	g_vertex_color_dataA[18*i + 4] = 0.0f;
 	g_vertex_color_dataA[18*i + 5] = 0.0f;
 
-	g_vertex_color_dataA[18*i + 6] = 1.0f;
+	g_vertex_color_dataA[18*i + 6] = couleur;
 	g_vertex_color_dataA[18*i + 7] = 0.0f;
 	g_vertex_color_dataA[18*i + 8] = 0.0f;
 
-	g_vertex_color_dataA[18*i + 9] = 1.0f;
+	g_vertex_color_dataA[18*i + 9] = couleur;
 	g_vertex_color_dataA[18*i + 10] = 0.0f;
 	g_vertex_color_dataA[18*i + 11] = 0.0f;
 
-	g_vertex_color_dataA[18*i + 12] = 1.0f;
+	g_vertex_color_dataA[18*i + 12] = couleur;
 	g_vertex_color_dataA[18*i + 13] = 0.0f;
 	g_vertex_color_dataA[18*i + 14] = 0.0f;
 
-	g_vertex_color_dataA[18*i + 15] = 1.0f;
+	g_vertex_color_dataA[18*i + 15] = couleur;
 	g_vertex_color_dataA[18*i + 16] = 0.0f;
 	g_vertex_color_dataA[18*i + 17] = 0.0f;
 
@@ -469,7 +479,7 @@ g_vertex_color_dataA[size_draw-3*3+8] = 1.0f;
 
 int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDB){
 	int size_draw = 4*3*3*(N-1);
-  GLfloat g_vertex_buffer_dataB[size_draw+4*3*3];
+  GLfloat g_vertex_buffer_dataB[size_draw];
 	GLfloat g_vertex_color_dataB[size_draw]; // 4 triangles of 3 points with 3 coordinates each
 
   //cout<< "loadModelB " << (sizeof(g_vertex_buffer_dataB)/(sizeof(float)))<<" % "<<(3*3*4*(N))<<endl;
@@ -480,53 +490,56 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
   // on rajoute des faces et de la hauteur a notre figure
   for (int i=0; i<N-1; i++){
-    g_vertex_buffer_dataB[36*i + 0] = i;
-    g_vertex_buffer_dataB[36*i + 1] = vecVals[i];
-    g_vertex_buffer_dataB[36*i + 2] = 0.0f+profondeur_B;
+	float distance = i/2000.0;
+float distance1 = (i+1)/2000.0;
+    g_vertex_buffer_dataB[36*i + 0] = distance;
+    g_vertex_buffer_dataB[36*i + 1] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 2] = vecVals[i];
 
-    g_vertex_buffer_dataB[36*i + 3] = i;
-    g_vertex_buffer_dataB[36*i + 4] = 0.0f;
-    g_vertex_buffer_dataB[36*i + 5] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 3] = distance;
+    g_vertex_buffer_dataB[36*i + 4] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 5] = 0.0f;
 
-    g_vertex_buffer_dataB[36*i + 6] = i+1;
-    g_vertex_buffer_dataB[36*i + 7] = 0.0f;
-    g_vertex_buffer_dataB[36*i + 8] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 6] = distance1;
+    g_vertex_buffer_dataB[36*i + 7] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 8] = 0.0f;
 
-    g_vertex_buffer_dataB[36*i + 9] = i;
-    g_vertex_buffer_dataB[36*i + 10] = vecVals[i];
-    g_vertex_buffer_dataB[36*i + 11] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 9] = distance;
+    g_vertex_buffer_dataB[36*i + 10] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 11] = vecVals[i];
 
-    g_vertex_buffer_dataB[36*i + 12] = i+1;
-    g_vertex_buffer_dataB[36*i + 13] = vecVals[i+1];
-    g_vertex_buffer_dataB[36*i + 14] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 12] = distance1;
+    g_vertex_buffer_dataB[36*i + 13] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 14] = vecVals[i+1];
 
-    g_vertex_buffer_dataB[36*i + 15] = i+1;
-    g_vertex_buffer_dataB[36*i + 16] = 0.0f;
-    g_vertex_buffer_dataB[36*i + 17] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 15] = distance1;
+    g_vertex_buffer_dataB[36*i + 16] = 0.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 17] = 0.0f;
 
-    g_vertex_buffer_dataB[36*i + 18] = i;
-    g_vertex_buffer_dataB[36*i + 19] = vecVals[i];
-    g_vertex_buffer_dataB[36*i + 20] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 18] = distance;
+    g_vertex_buffer_dataB[36*i + 19] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 20] = vecVals[i];
 
-    g_vertex_buffer_dataB[36*i + 21] = i;
-    g_vertex_buffer_dataB[36*i + 22] = 0.0f;
-    g_vertex_buffer_dataB[36*i + 23] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 21] = distance;
+    g_vertex_buffer_dataB[36*i + 22] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 23] = 0.0f;
 
-    g_vertex_buffer_dataB[36*i + 24] = i+1;
-    g_vertex_buffer_dataB[36*i + 25] = 0.0f;
-    g_vertex_buffer_dataB[36*i + 26] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 24] = distance1;
+    g_vertex_buffer_dataB[36*i + 25] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 26] = 0.0f;
 
-    g_vertex_buffer_dataB[36*i + 27] = i;
-    g_vertex_buffer_dataB[36*i + 28] = vecVals[i];
-    g_vertex_buffer_dataB[36*i + 29] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 27] = distance;
+    g_vertex_buffer_dataB[36*i + 28] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 29] = vecVals[i];
 
-    g_vertex_buffer_dataB[36*i + 30] = i+1;
-    g_vertex_buffer_dataB[36*i + 31] = vecVals[i+1];
-    g_vertex_buffer_dataB[36*i + 32] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 30] = distance1;
+    g_vertex_buffer_dataB[36*i + 31] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 32] = vecVals[i+1];
 
-    g_vertex_buffer_dataB[36*i + 33] = i+1;
-    g_vertex_buffer_dataB[36*i + 34] = 0.0f;
-    g_vertex_buffer_dataB[36*i + 35] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 33] = distance1;
+    g_vertex_buffer_dataB[36*i + 34] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 35] = 0.0f;
+	cout << vecVals[i] << endl;
   }
 
 profondeur_B+=2;
@@ -648,7 +661,7 @@ int main(){
   int m11 = loadModelA(vols10, vals10, VertexArrayIDA1);
   int m12 = loadModelB(vols10, vals10, VertexArrayIDB1);
  
-/** int m21 = loadModelA(vols20, vals20, VertexArrayIDA2);
+  int m21 = loadModelA(vols20, vals20, VertexArrayIDA2);
   int m22 = loadModelB(vols20, vals20, VertexArrayIDB2);
 
   int m31 = loadModelA(vols30, vals30, VertexArrayIDA3);
@@ -656,7 +669,7 @@ int main(){
 
   int m41 = loadModelA(vols40, vals40, VertexArrayIDA4);
   int m42 = loadModelB(vols40, vals40, VertexArrayIDB4);
-**/
+
   GLuint ProgramA        = LoadShaders( "projet2018A.vs", "projet2018A.fs" );
   GLint  uniform_projection     = glGetUniformLocation(ProgramA, "projectionMatrix");
   GLint  uniform_view     = glGetUniformLocation(ProgramA, "viewMatrix");
@@ -672,7 +685,6 @@ GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 	float angleRotate_Z = 0;
 //float camPos[3] = {5+cos(angle), 5+sin(angle), -0.5};
   do {
-	cout << angle<<endl;
     // clear before every draw
     glClearColor( 1.0, 1.0, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
