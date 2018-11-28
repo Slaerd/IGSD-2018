@@ -216,42 +216,41 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 
 int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDA){
-	int size_draw = 2*3*3*(N-1);
-  GLfloat g_vertex_buffer_dataA[size_draw+4*3*3];
-  GLfloat g_vertex_normal_dataA[size_draw+4*3*3];
+	int size_draw = 2*3*3*(N-1)+3*3;
+  GLfloat g_vertex_buffer_dataA[size_draw];//+4*3*3];
+  GLfloat g_vertex_normal_dataA[size_draw];//+4*3*3];
   GLfloat g_vertex_color_dataA[size_draw];
 
-  for(int i=0; i<size_draw+4*3*3; i++){
+  for(int i=0; i<size_draw; i++){
     g_vertex_buffer_dataA[i] = 0.654321;
     g_vertex_color_dataA[i]  = 0.654321;
 	g_vertex_normal_dataA[i] = 0.0f;
   }
 
   for (int i=0; i<N-1; i++){
-
 	g_vertex_buffer_dataA[18*i + 0] = i;
-	g_vertex_buffer_dataA[18*i + 1] = 0.0f+profondeur_A;
-	g_vertex_buffer_dataA[18*i + 2] = vecVals[i];
+	g_vertex_buffer_dataA[18*i + 1] = vecVals[i];
+	g_vertex_buffer_dataA[18*i + 2] = 0.0f+profondeur_A;
 
 	g_vertex_buffer_dataA[18*i + 3] = i;
-	g_vertex_buffer_dataA[18*i + 4] = 1.0f+profondeur_A;
-	g_vertex_buffer_dataA[18*i + 5] = vecVals[i];
+	g_vertex_buffer_dataA[18*i + 4] = vecVals[i];
+	g_vertex_buffer_dataA[18*i + 5] = 1.0f+profondeur_A;
 
 	g_vertex_buffer_dataA[18*i + 6] = i+1;
-	g_vertex_buffer_dataA[18*i + 7] = 0.0f+profondeur_A;
-	g_vertex_buffer_dataA[18*i + 8] = vecVals[i+1];
+	g_vertex_buffer_dataA[18*i + 7] = vecVals[i+1];
+	g_vertex_buffer_dataA[18*i + 8] = 0.0f+profondeur_A;
 
 	g_vertex_buffer_dataA[18*i + 9] = i;
-	g_vertex_buffer_dataA[18*i + 10] = 1.0f+profondeur_A;
-	g_vertex_buffer_dataA[18*i + 11] = vecVals[i];
+	g_vertex_buffer_dataA[18*i + 10] = vecVals[i];
+	g_vertex_buffer_dataA[18*i + 11] = 1.0f+profondeur_A;
 
 	g_vertex_buffer_dataA[18*i + 12] = i+1;
-	g_vertex_buffer_dataA[18*i + 13] = 0.0f+profondeur_A;
-	g_vertex_buffer_dataA[18*i + 14] = vecVals[i+1];
+	g_vertex_buffer_dataA[18*i + 13] = vecVals[i+1];
+	g_vertex_buffer_dataA[18*i + 14] = 0.0f+profondeur_A;
 
 	g_vertex_buffer_dataA[18*i + 15] = i+1;
-	g_vertex_buffer_dataA[18*i + 16] = 1.0f+profondeur_A;
-	g_vertex_buffer_dataA[18*i + 17] = vecVals[i+1];
+	g_vertex_buffer_dataA[18*i + 16] = vecVals[i+1];
+	g_vertex_buffer_dataA[18*i + 17] = 1.0f+profondeur_A;
 
 	g_vertex_color_dataA[18*i + 0] = 1.0f;
 	g_vertex_color_dataA[18*i + 1] = 0.0f;
@@ -278,6 +277,31 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_color_dataA[18*i + 17] = 0.0f;
 
   }
+g_vertex_buffer_dataA[size_draw-3*3] = 0.0f;
+g_vertex_buffer_dataA[size_draw-3*3+1] = 0.0f;
+g_vertex_buffer_dataA[size_draw-3*3+2] = 0.0f;
+
+g_vertex_buffer_dataA[size_draw-3*3+3] = 1.0f;
+g_vertex_buffer_dataA[size_draw-3*3+4] = 1.0f;
+g_vertex_buffer_dataA[size_draw-3*3+5] = 0.0f;
+
+g_vertex_buffer_dataA[size_draw-3*3+6] = 1.0f;
+g_vertex_buffer_dataA[size_draw-3*3+7] = 0.0f;
+g_vertex_buffer_dataA[size_draw-3*3+8] = 0.0f;
+
+
+g_vertex_color_dataA[size_draw-3*3] = 0.0f;
+g_vertex_color_dataA[size_draw-3*3+1] = 0.0f;
+g_vertex_color_dataA[size_draw-3*3+2] = 1.0f;
+
+g_vertex_color_dataA[size_draw-3*3+3] = 0.0f;
+g_vertex_color_dataA[size_draw-3*3+4] = 0.0f;
+g_vertex_color_dataA[size_draw-3*3+5] = 1.0f;
+
+g_vertex_color_dataA[size_draw-3*3+6] = 0.0f;
+g_vertex_color_dataA[size_draw-3*3+7] = 0.0f;
+g_vertex_color_dataA[size_draw-3*3+8] = 1.0f;
+/**
 	g_vertex_buffer_dataA[size_draw+0] = 0.0;
     g_vertex_buffer_dataA[size_draw+1] = vecVals[0];
     g_vertex_buffer_dataA[size_draw+2] = 0.0+profondeur_A;
@@ -373,11 +397,11 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
     g_vertex_color_dataA[size_draw+33] = 0.0f;
     g_vertex_color_dataA[size_draw+34] = 1.0f;
     g_vertex_color_dataA[size_draw+35] = 0.0f;
-
+**/
 	profondeur_A+=2;
 
   // on teste s'il ne reste pas notre valeur bizarre dans le tableau = on a pas oublie de cases !
-  for(int i=0; i<size_draw+4*3*3; i++)
+  for(int i=0; i<size_draw; i++)
     if (g_vertex_buffer_dataA[i] > 0.654320 && g_vertex_buffer_dataA[i] < 0.654322)
       cout << i<<" EVIL IS IN THE DETAIL !" << endl ;
 
@@ -437,7 +461,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
   // on desactive le VAO a la fin de l'initialisation
   glBindVertexArray (0);
-	cout << (size_draw + 4*3*3)/3 << "   " << sizeof(g_vertex_buffer_dataA)/(3*sizeof(float)) << endl;
+	cout << (size_draw)/3 << "   " << sizeof(g_vertex_buffer_dataA)/(3*sizeof(float)) << endl;
   return sizeof(g_vertex_buffer_dataA)/(3*sizeof(float));
 }
 
@@ -457,52 +481,52 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   // on rajoute des faces et de la hauteur a notre figure
   for (int i=0; i<N-1; i++){
     g_vertex_buffer_dataB[36*i + 0] = i;
-    g_vertex_buffer_dataB[36*i + 1] = 0.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 2] = vecVals[i];
+    g_vertex_buffer_dataB[36*i + 1] = vecVals[i];
+    g_vertex_buffer_dataB[36*i + 2] = 0.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 3] = i;
-    g_vertex_buffer_dataB[36*i + 4] = 0.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 5] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 4] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 5] = 0.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 6] = i+1;
-    g_vertex_buffer_dataB[36*i + 7] = 0.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 8] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 7] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 8] = 0.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 9] = i;
-    g_vertex_buffer_dataB[36*i + 10] = 0.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 11] = vecVals[i];
+    g_vertex_buffer_dataB[36*i + 10] = vecVals[i];
+    g_vertex_buffer_dataB[36*i + 11] = 0.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 12] = i+1;
-    g_vertex_buffer_dataB[36*i + 13] = 0.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 14] = vecVals[i+1];
+    g_vertex_buffer_dataB[36*i + 13] = vecVals[i+1];
+    g_vertex_buffer_dataB[36*i + 14] = 0.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 15] = i+1;
-    g_vertex_buffer_dataB[36*i + 16] = 0.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 17] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 16] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 17] = 0.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 18] = i;
-    g_vertex_buffer_dataB[36*i + 19] = 1.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 20] = vecVals[i];
+    g_vertex_buffer_dataB[36*i + 19] = vecVals[i];
+    g_vertex_buffer_dataB[36*i + 20] = 1.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 21] = i;
-    g_vertex_buffer_dataB[36*i + 22] = 1.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 23] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 22] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 23] = 1.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 24] = i+1;
-    g_vertex_buffer_dataB[36*i + 25] = 1.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 26] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 25] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 26] = 1.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 27] = i;
-    g_vertex_buffer_dataB[36*i + 28] = 1.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 29] = vecVals[i];
+    g_vertex_buffer_dataB[36*i + 28] = vecVals[i];
+    g_vertex_buffer_dataB[36*i + 29] = 1.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 30] = i+1;
-    g_vertex_buffer_dataB[36*i + 31] = 1.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 32] = vecVals[i+1];
+    g_vertex_buffer_dataB[36*i + 31] = vecVals[i+1];
+    g_vertex_buffer_dataB[36*i + 32] = 1.0f+profondeur_B;
 
     g_vertex_buffer_dataB[36*i + 33] = i+1;
-    g_vertex_buffer_dataB[36*i + 34] = 1.0f+profondeur_B;
-    g_vertex_buffer_dataB[36*i + 35] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 34] = 0.0f;
+    g_vertex_buffer_dataB[36*i + 35] = 1.0f+profondeur_B;
   }
 
 profondeur_B+=2;
@@ -623,7 +647,8 @@ int main(){
 
   int m11 = loadModelA(vols10, vals10, VertexArrayIDA1);
   int m12 = loadModelB(vols10, vals10, VertexArrayIDB1);
-  int m21 = loadModelA(vols20, vals20, VertexArrayIDA2);
+ 
+/** int m21 = loadModelA(vols20, vals20, VertexArrayIDA2);
   int m22 = loadModelB(vols20, vals20, VertexArrayIDB2);
 
   int m31 = loadModelA(vols30, vals30, VertexArrayIDA3);
@@ -631,7 +656,7 @@ int main(){
 
   int m41 = loadModelA(vols40, vals40, VertexArrayIDA4);
   int m42 = loadModelB(vols40, vals40, VertexArrayIDB4);
-
+**/
   GLuint ProgramA        = LoadShaders( "projet2018A.vs", "projet2018A.fs" );
   GLint  uniform_projection     = glGetUniformLocation(ProgramA, "projectionMatrix");
   GLint  uniform_view     = glGetUniformLocation(ProgramA, "viewMatrix");
@@ -645,8 +670,9 @@ GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 	float angleRotate_X = 0;
 	float angleRotate_Y = 0;
 	float angleRotate_Z = 0;
-float camPos[3] = {4.5*cos(angle), 4.5*sin(angle), -.5};
+//float camPos[3] = {5+cos(angle), 5+sin(angle), -0.5};
   do {
+	cout << angle<<endl;
     // clear before every draw
     glClearColor( 1.0, 1.0, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -657,7 +683,7 @@ float camPos[3] = {4.5*cos(angle), 4.5*sin(angle), -.5};
     // onchange de matrice de projection : la projection orthogonale est plus propice a la visualization !
     //glm::mat4 projectionMatrix = glm::perspective(glm::radians(66.0f), 1024.0f / 768.0f, 0.1f, 200.0f);
     glm::mat4 projectionMatrix = glm::ortho( -1.0f, 1.0f, -1.0f, 1.0f, -6.f, 6.f );
-    //float camPos[3] = {5*cos(angle), 5*sin(angle), -.5};
+    float camPos[3] = {5*cos(angle), 5*sin(angle), -.5};
     glm::mat4 viewMatrix       = glm::lookAt(
                                   glm::make_vec3(camPos), // where is the camara
                                   vec3(0, 0, 0), //where it looks
@@ -679,9 +705,9 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
 	rotation_Z[1][0] = sin(angleRotate_Z);
 	rotation_Z[1][1] = cos(angleRotate_Z);
     mat4 modelMatrixA     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
-    modelMatrixA          =  translate(modelMatrixA, glm::vec3(0.0f, 0.3f, 0.0f)) * rotation_X * rotation_Y * rotation_Z * scale(glm::mat4(1.0f), glm::vec3(0.75f));
+    modelMatrixA          =  translate(modelMatrixA, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
 mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
-    modelMatrixB          =  translate(modelMatrixB, glm::vec3(0.0f, 0.3f, 0.0f)) * rotation_X * rotation_Y * rotation_Z * scale(glm::mat4(1.0f), glm::vec3(0.75f)) ;
+    modelMatrixB          =  translate(modelMatrixB, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f)) ;
 	
 
 
@@ -693,7 +719,7 @@ mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     // on re-active les VAO avant d'envoyer les buffers
     glBindVertexArray(VertexArrayIDA1);
     glDrawArrays(GL_TRIANGLES, 0, m11);
-
+/**
     glBindVertexArray(VertexArrayIDA2);
     glDrawArrays(GL_TRIANGLES, 0, m21);
 
@@ -702,7 +728,7 @@ mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
 
     glBindVertexArray(VertexArrayIDA4);
     glDrawArrays(GL_TRIANGLES, 0, m41);
-
+**/
 
     glUseProgram(ProgramB);
     glUniformMatrix4fv(uniform_view,  1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -711,7 +737,7 @@ mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
 
     glBindVertexArray(VertexArrayIDB1);
     glDrawArrays(GL_TRIANGLES, 0, m12); // Starting from vertex 0 .. all the buffer
-
+/**
     glBindVertexArray(VertexArrayIDB2);
     glDrawArrays(GL_TRIANGLES, 0, m22);
 
@@ -720,7 +746,7 @@ mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
 
     glBindVertexArray(VertexArrayIDB4);
     glDrawArrays(GL_TRIANGLES, 0, m42);
-
+**/
     // on desactive le VAO a la fin du dessin
     glBindVertexArray (0);
 
@@ -732,9 +758,9 @@ mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     glfwPollEvents();
 	//std::cout << "X = "<< camPos[0] << "; Y = " << camPos[1] << "; Z = " << camPos[2] << endl;
     if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
-      //TO DO
+      angle+=0.01;
     } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
-      //TO DO
+      angle -=0.01;
     } else if (glfwGetKey(window, GLFW_KEY_R ) == GLFW_PRESS){
       camPos[0] = camPos[0];
       camPos[1] = camPos[1];
@@ -768,12 +794,12 @@ mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     } else if ( glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS ){
 //&& SMOOTHING_VOLS>1){
       camPos[0] = camPos[0];
-	  camPos[1] = camPos[1]+0.01;
-	  camPos[2] = camPos[2];
+	  camPos[1] = camPos[1];
+	  camPos[2] = camPos[2]+0.1;
     } else if ( glfwGetKey(window, GLFW_KEY_UP ) == GLFW_PRESS ){//&& SMOOTHING_VOLS<32){
       camPos[0] = camPos[0];
-	  camPos[1] = camPos[1]-0.01;
-	  camPos[2] = camPos[2];
+	  camPos[1] = camPos[1];
+	  camPos[2] = camPos[2]-0.1;
     }
 
   } // Vérifie si on a appuyé sur la touche échap (ESC) ou si la fenêtre a été fermée
