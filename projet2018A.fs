@@ -1,7 +1,7 @@
 #version 330 core
 
 smooth in float depth;
-smooth in vec3 color;
+in vec3 color;
 
 out vec4 coloro;
 

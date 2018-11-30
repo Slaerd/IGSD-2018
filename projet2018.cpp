@@ -46,8 +46,8 @@ float nbBands = 8.0f;
 
 int N = 4;
 
-int profondeur_A = 0;
-int profondeur_B = 0;
+int profondeur_A = -2;
+int profondeur_B = -2;
 
 int SMOOTHING_VALS = 1;
 int SMOOTHING_VOLS = 1;
@@ -227,23 +227,30 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
     g_vertex_color_dataA[i]  = 0.654321;
 	g_vertex_normal_dataA[i] = 0.0f;
   }
-  float couleur = 0;
   for (int i=0; i<N-1; i++){
-	if (vecVals[i] < 0.5)
-		couleur = 0.0f;
-	else if (vecVals[i] < 0.8)
-		couleur = 0.5f;
-	else 
-		couleur = 1.0f;
+	
+  float couleur_R = 0;
+  float couleur_G = 0;
+  float couleur_B = 0;
+	if (vecVals[i] < vecVals[i+1])
+		couleur_G = 1.0f;
+	else if (vecVals[i] == vecVals[i+1]){
+		couleur_R = 0.5f;
+		couleur_G = 0.5f;
+		couleur_B = 0.5f;
+	} else 
+		couleur_R = 1.0f;
 	float distance = i/2000.0;
 float distance1 = (i+1)/2000.0;
+	float rootActExch = sqrt(vecVols[i]);
+	float rootActExch1 = sqrt(vecVols[i+1]);
 
 	g_vertex_buffer_dataA[18*i + 0] = distance;
 	g_vertex_buffer_dataA[18*i + 1] = 0.0f+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 2] = vecVals[i];
 
 	g_vertex_buffer_dataA[18*i + 3] = distance;
-	g_vertex_buffer_dataA[18*i + 4] = 1.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 4] = rootActExch+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 5] = vecVals[i];
 
 	g_vertex_buffer_dataA[18*i + 6] = distance1;
@@ -251,7 +258,7 @@ float distance1 = (i+1)/2000.0;
 	g_vertex_buffer_dataA[18*i + 8] = vecVals[i+1];
 
 	g_vertex_buffer_dataA[18*i + 9] = distance;
-	g_vertex_buffer_dataA[18*i + 10] = 1.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 10] = rootActExch+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 11] = vecVals[i];
 
 	g_vertex_buffer_dataA[18*i + 12] = distance1;
@@ -259,156 +266,35 @@ float distance1 = (i+1)/2000.0;
 	g_vertex_buffer_dataA[18*i + 14] = vecVals[i+1];
 
 	g_vertex_buffer_dataA[18*i + 15] = distance1;
-	g_vertex_buffer_dataA[18*i + 16] = 1.0f+profondeur_A;
+	g_vertex_buffer_dataA[18*i + 16] = rootActExch1+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 17] = vecVals[i+1];
 
-	g_vertex_color_dataA[18*i + 0] = couleur;
-	g_vertex_color_dataA[18*i + 1] = 0.0f;
-	g_vertex_color_dataA[18*i + 2] = 0.0f;
+	g_vertex_color_dataA[18*i + 0] = couleur_R;
+	g_vertex_color_dataA[18*i + 1] = couleur_G;
+	g_vertex_color_dataA[18*i + 2] = couleur_B;
 
-	g_vertex_color_dataA[18*i + 3] = couleur;
-	g_vertex_color_dataA[18*i + 4] = 0.0f;
-	g_vertex_color_dataA[18*i + 5] = 0.0f;
+	g_vertex_color_dataA[18*i + 3] = couleur_R;
+	g_vertex_color_dataA[18*i + 4] = couleur_G;
+	g_vertex_color_dataA[18*i + 5] = couleur_B;
 
-	g_vertex_color_dataA[18*i + 6] = couleur;
-	g_vertex_color_dataA[18*i + 7] = 0.0f;
-	g_vertex_color_dataA[18*i + 8] = 0.0f;
+	g_vertex_color_dataA[18*i + 6] = couleur_R;
+	g_vertex_color_dataA[18*i + 7] = couleur_G;
+	g_vertex_color_dataA[18*i + 8] = couleur_B;
 
-	g_vertex_color_dataA[18*i + 9] = couleur;
-	g_vertex_color_dataA[18*i + 10] = 0.0f;
-	g_vertex_color_dataA[18*i + 11] = 0.0f;
+	g_vertex_color_dataA[18*i + 9] = couleur_R;
+	g_vertex_color_dataA[18*i + 10] = couleur_G;
+	g_vertex_color_dataA[18*i + 11] = couleur_B;
 
-	g_vertex_color_dataA[18*i + 12] = couleur;
-	g_vertex_color_dataA[18*i + 13] = 0.0f;
-	g_vertex_color_dataA[18*i + 14] = 0.0f;
+	g_vertex_color_dataA[18*i + 12] = couleur_R;
+	g_vertex_color_dataA[18*i + 13] = couleur_G;
+	g_vertex_color_dataA[18*i + 14] = couleur_B;
 
-	g_vertex_color_dataA[18*i + 15] = couleur;
-	g_vertex_color_dataA[18*i + 16] = 0.0f;
-	g_vertex_color_dataA[18*i + 17] = 0.0f;
+	g_vertex_color_dataA[18*i + 15] = couleur_R;
+	g_vertex_color_dataA[18*i + 16] = couleur_G;
+	g_vertex_color_dataA[18*i + 17] = couleur_B;
 
-  }/**
-g_vertex_buffer_dataA[size_draw-3*3] = 0.0f;
-g_vertex_buffer_dataA[size_draw-3*3+1] = 0.0f;
-g_vertex_buffer_dataA[size_draw-3*3+2] = 0.0f;
-
-g_vertex_buffer_dataA[size_draw-3*3+3] = 1.0f;
-g_vertex_buffer_dataA[size_draw-3*3+4] = 1.0f;
-g_vertex_buffer_dataA[size_draw-3*3+5] = 0.0f;
-
-g_vertex_buffer_dataA[size_draw-3*3+6] = 1.0f;
-g_vertex_buffer_dataA[size_draw-3*3+7] = 0.0f;
-g_vertex_buffer_dataA[size_draw-3*3+8] = 0.0f;
-
-
-g_vertex_color_dataA[size_draw-3*3] = 0.0f;
-g_vertex_color_dataA[size_draw-3*3+1] = 0.0f;
-g_vertex_color_dataA[size_draw-3*3+2] = 1.0f;
-
-g_vertex_color_dataA[size_draw-3*3+3] = 0.0f;
-g_vertex_color_dataA[size_draw-3*3+4] = 0.0f;
-g_vertex_color_dataA[size_draw-3*3+5] = 1.0f;
-
-g_vertex_color_dataA[size_draw-3*3+6] = 0.0f;
-g_vertex_color_dataA[size_draw-3*3+7] = 0.0f;
-g_vertex_color_dataA[size_draw-3*3+8] = 1.0f;**/
-/**
-	g_vertex_buffer_dataA[size_draw+0] = 0.0;
-    g_vertex_buffer_dataA[size_draw+1] = vecVals[0];
-    g_vertex_buffer_dataA[size_draw+2] = 0.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+3] = 0.0;
-    g_vertex_buffer_dataA[size_draw+4] = 0;
-    g_vertex_buffer_dataA[size_draw+5] = 0.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+6] = 0.0;
-    g_vertex_buffer_dataA[size_draw+7] = 0;
-    g_vertex_buffer_dataA[size_draw+8] = 1.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+9] = 0.0;
-    g_vertex_buffer_dataA[size_draw+10] = vecVals[0];
-    g_vertex_buffer_dataA[size_draw+11] = 0.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+12] = 0.0;
-    g_vertex_buffer_dataA[size_draw+13] = 0;
-    g_vertex_buffer_dataA[size_draw+14] = 1.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+15] = 0.0;
-    g_vertex_buffer_dataA[size_draw+16] = vecVals[size_draw-1];
-    g_vertex_buffer_dataA[size_draw+17] = 1.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+18] = N-1;
-    g_vertex_buffer_dataA[size_draw+19] = vecVals[size_draw-1];
-    g_vertex_buffer_dataA[size_draw+20] = 0.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+21] = N-1;
-    g_vertex_buffer_dataA[size_draw+22] = 0;
-    g_vertex_buffer_dataA[size_draw+23] = 0.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+24] = N-1;
-    g_vertex_buffer_dataA[size_draw+25] = 0;
-    g_vertex_buffer_dataA[size_draw+26] = 1.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+27] = N-1;
-    g_vertex_buffer_dataA[size_draw+28] = vecVals[N-1];
-    g_vertex_buffer_dataA[size_draw+29] = 0.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+30] = N-1;
-    g_vertex_buffer_dataA[size_draw+31] = 0;
-    g_vertex_buffer_dataA[size_draw+32] = 1.0+profondeur_A;
-
-    g_vertex_buffer_dataA[size_draw+33] = N-1;
-    g_vertex_buffer_dataA[size_draw+34] = vecVals[N-1];
-    g_vertex_buffer_dataA[size_draw+35] = 1.0+profondeur_A;
-
-	g_vertex_color_dataA[size_draw+0] = 0.0f;
-    g_vertex_color_dataA[size_draw+1] = 1.0f;
-    g_vertex_color_dataA[size_draw+2] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+3] = 0.0f;
-    g_vertex_color_dataA[size_draw+4] = 1.0f;
-    g_vertex_color_dataA[size_draw+5] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+6] = 0.0f;
-    g_vertex_color_dataA[size_draw+7] = 1.0f;
-    g_vertex_color_dataA[size_draw+8] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+9] = 0.0f;
-    g_vertex_color_dataA[size_draw+10] = 1.0f;
-    g_vertex_color_dataA[size_draw+11] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+12] = 0.0f;
-    g_vertex_color_dataA[size_draw+13] = 1.0f;
-    g_vertex_color_dataA[size_draw+14] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+15] = 0.0f;
-    g_vertex_color_dataA[size_draw+16] = 1.0f;
-    g_vertex_color_dataA[size_draw+17] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+18] = 0.0f;
-    g_vertex_color_dataA[size_draw+19] = 1.0f;
-    g_vertex_color_dataA[size_draw+20] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+21] = 0.0f;
-    g_vertex_color_dataA[size_draw+22] = 1.0f;
-    g_vertex_color_dataA[size_draw+23] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+24] = 0.0f;
-    g_vertex_color_dataA[size_draw+25] = 1.0f;
-    g_vertex_color_dataA[size_draw+26] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+27] = 0.0f;
-    g_vertex_color_dataA[size_draw+28] = 1.0f;
-    g_vertex_color_dataA[size_draw+29] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+30] = 0.0f;
-    g_vertex_color_dataA[size_draw+31] = 1.0f;
-    g_vertex_color_dataA[size_draw+32] = 0.0f;
-
-    g_vertex_color_dataA[size_draw+33] = 0.0f;
-    g_vertex_color_dataA[size_draw+34] = 1.0f;
-    g_vertex_color_dataA[size_draw+35] = 0.0f;
-**/
-	profondeur_A+=2;
+  }
+	profondeur_A+=1;
 
   // on teste s'il ne reste pas notre valeur bizarre dans le tableau = on a pas oublie de cases !
   for(int i=0; i<size_draw; i++)
@@ -471,7 +357,6 @@ g_vertex_color_dataA[size_draw-3*3+8] = 1.0f;**/
 
   // on desactive le VAO a la fin de l'initialisation
   glBindVertexArray (0);
-	cout << (size_draw)/3 << "   " << sizeof(g_vertex_buffer_dataA)/(3*sizeof(float)) << endl;
   return sizeof(g_vertex_buffer_dataA)/(3*sizeof(float));
 }
 
@@ -479,7 +364,7 @@ g_vertex_color_dataA[size_draw-3*3+8] = 1.0f;**/
 
 int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDB){
 	int size_draw = 4*3*3*(N-1);
-  GLfloat g_vertex_buffer_dataB[size_draw+3*3];
+  GLfloat g_vertex_buffer_dataB[size_draw+4*3*3];
 	GLfloat g_vertex_color_dataB[size_draw]; // 4 triangles of 3 points with 3 coordinates each
 
   //cout<< "loadModelB " << (sizeof(g_vertex_buffer_dataB)/(sizeof(float)))<<" % "<<(3*3*4*(N))<<endl;
@@ -492,6 +377,8 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   for (int i=0; i<N-1; i++){
 	float distance = i/2000.0;
 	float distance1 = (i+1)/2000.0;
+	float rootActExch = sqrt(vecVols[i]);
+	float rootActExch1 = sqrt(vecVols[i+1]);
     g_vertex_buffer_dataB[36*i + 0] = distance;
     g_vertex_buffer_dataB[36*i + 1] = 0.0f+profondeur_B;
     g_vertex_buffer_dataB[36*i + 2] = vecVals[i];
@@ -517,42 +404,81 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
     g_vertex_buffer_dataB[36*i + 17] = 0.0f;
 
     g_vertex_buffer_dataB[36*i + 18] = distance;
-    g_vertex_buffer_dataB[36*i + 19] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 19] = rootActExch+profondeur_B;
     g_vertex_buffer_dataB[36*i + 20] = vecVals[i];
 
     g_vertex_buffer_dataB[36*i + 21] = distance;
-    g_vertex_buffer_dataB[36*i + 22] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 22] = rootActExch+profondeur_B;
     g_vertex_buffer_dataB[36*i + 23] = 0.0f;
 
     g_vertex_buffer_dataB[36*i + 24] = distance1;
-    g_vertex_buffer_dataB[36*i + 25] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 25] = rootActExch1+profondeur_B;
     g_vertex_buffer_dataB[36*i + 26] = 0.0f;
 
     g_vertex_buffer_dataB[36*i + 27] = distance;
-    g_vertex_buffer_dataB[36*i + 28] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 28] = rootActExch+profondeur_B;
     g_vertex_buffer_dataB[36*i + 29] = vecVals[i];
 
     g_vertex_buffer_dataB[36*i + 30] = distance1;
-    g_vertex_buffer_dataB[36*i + 31] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 31] = rootActExch1+profondeur_B;
     g_vertex_buffer_dataB[36*i + 32] = vecVals[i+1];
 
     g_vertex_buffer_dataB[36*i + 33] = distance1;
-    g_vertex_buffer_dataB[36*i + 34] = 1.0f+profondeur_B;
+    g_vertex_buffer_dataB[36*i + 34] = rootActExch1+profondeur_B;
     g_vertex_buffer_dataB[36*i + 35] = 0.0f;
   }
-g_vertex_buffer_dataB[size_draw+3*3] = 0.0f;
-g_vertex_buffer_dataB[size_draw+3*3+1] = 0.0f;
-g_vertex_buffer_dataB[size_draw+3*3+2] = 0.0f;
+float distance_max = (N-1)/2000.0;
+float rootActExch0 = sqrt(vecVols[0]);
+float rootActExchmax = sqrt(vecVols[N-1]);
+g_vertex_buffer_dataB[size_draw+0] = 0.0;
+    g_vertex_buffer_dataB[size_draw+1] = 0.0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+2] = vecVals[0];
 
-g_vertex_buffer_dataB[size_draw+3*3+3] = 2.0f;
-g_vertex_buffer_dataB[size_draw+3*3+4] = 1.0f;
-g_vertex_buffer_dataB[size_draw+3*3+5] = 0.0f;
+    g_vertex_buffer_dataB[size_draw+3] = 0.0;
+    g_vertex_buffer_dataB[size_draw+4] = 0.0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+5] = 0.0;
 
-g_vertex_buffer_dataB[size_draw+3*3+6] = 1.0f;
-g_vertex_buffer_dataB[size_draw+3*3+7] = 0.0f;
-g_vertex_buffer_dataB[size_draw+3*3+8] = 0.0f;
+    g_vertex_buffer_dataB[size_draw+6] = 0.0;
+    g_vertex_buffer_dataB[size_draw+7] = rootActExch0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+8] = 0.0;
 
-profondeur_B+=2;
+    g_vertex_buffer_dataB[size_draw+9] = 0.0;
+    g_vertex_buffer_dataB[size_draw+10] = 0.0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+11] = vecVals[0];
+
+    g_vertex_buffer_dataB[size_draw+12] = 0.0;
+    g_vertex_buffer_dataB[size_draw+13] = rootActExch0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+14] = 0.0;
+
+    g_vertex_buffer_dataB[size_draw+15] = 0.0;
+    g_vertex_buffer_dataB[size_draw+16] = rootActExch0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+17] = vecVals[0];
+
+    g_vertex_buffer_dataB[size_draw+18] = distance_max;
+    g_vertex_buffer_dataB[size_draw+19] = 0.0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+20] = vecVals[N-1];
+
+    g_vertex_buffer_dataB[size_draw+21] = distance_max;
+    g_vertex_buffer_dataB[size_draw+22] = 0.0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+23] = 0.0;
+
+    g_vertex_buffer_dataB[size_draw+24] = distance_max;
+    g_vertex_buffer_dataB[size_draw+25] = rootActExchmax+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+26] = 0.0;
+
+    g_vertex_buffer_dataB[size_draw+27] = distance_max;
+    g_vertex_buffer_dataB[size_draw+28] = 0.0+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+29] = vecVals[N-1];
+
+    g_vertex_buffer_dataB[size_draw+30] = distance_max;
+    g_vertex_buffer_dataB[size_draw+31] = rootActExchmax+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+32] = 0.0;
+
+    g_vertex_buffer_dataB[size_draw+33] = distance_max;
+    g_vertex_buffer_dataB[size_draw+34] = rootActExchmax+profondeur_B;
+    g_vertex_buffer_dataB[size_draw+35] = vecVals[N-1];
+
+profondeur_B+=1;
   // ???
   
   for(int i=0; i<size_draw; i++)
@@ -691,6 +617,8 @@ int main(){
 GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 
 double angle = 0.0;
+bool Rotate_Sens = false;
+float Incre = 0.01;
 
 	
 	float angleRotate_X = 0;
@@ -707,12 +635,11 @@ double angle = 0.0;
 
     // Use our shader program
     glUseProgram(ProgramA);
-	//angle += 0.1;
+    angle += Incre;
     // onchange de matrice de projection : la projection orthogonale est plus propice a la visualization !
     //glm::mat4 projectionMatrix = glm::perspective(glm::radians(66.0f), 1024.0f / 768.0f, 0.1f, 200.0f);
     glm::mat4 projectionMatrix = glm::ortho( -1.0f, 1.0f, -1.0f, 1.0f, -6.f, 6.f );
-    float camPos[3] = {7.5*cos(angle)+deca_X, 7.5*sin(angle), -.5+deca_Z};
-	cout << camPos[0] << endl;
+    float camPos[3] = {5*cos(angle)+deca_X, 5*sin(angle), -.5+deca_Z};
     glm::mat4 viewMatrix       = glm::lookAt(
                                   glm::make_vec3(camPos), // where is the camara
                                   vec3(0, 0, 0), //where it looks
@@ -791,35 +718,21 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
     glfwPollEvents();
 	//std::cout << "X = "<< camPos[0] << "; Y = " << camPos[1] << "; Z = " << camPos[2] << endl;
     if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
-      angle+=0.01;
+      //TODO
     } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
-      angle -=0.01;
+      //TODO
     } else if (glfwGetKey(window, GLFW_KEY_R ) == GLFW_PRESS){
-      camPos[0] = camPos[0];
-      camPos[1] = camPos[1];
-      camPos[2] = camPos[2]+0.01;
-	  //glRotatef(angleRotate,0,1,0);
+      //TODO
     } else if (glfwGetKey(window, GLFW_KEY_F ) == GLFW_PRESS){
-      camPos[0] = camPos[0];
-      camPos[1] = camPos[1];
-      camPos[2] = camPos[2]-0.01;
-    } else if (glfwGetKey(window, GLFW_KEY_P ) == GLFW_PRESS){
-	angleRotate_Y +=0.01;
-    } else if (glfwGetKey(window, GLFW_KEY_N ) == GLFW_PRESS){
-	angleRotate_Y -=0.01;
-    } else if (glfwGetKey(window, GLFW_KEY_O ) == GLFW_PRESS){
-	angleRotate_Z += 0.01;
-    } else if (glfwGetKey(window, GLFW_KEY_L ) == GLFW_PRESS) {
-	angleRotate_Z -= 0.01;
-    } else if (glfwGetKey(window, GLFW_KEY_I ) == GLFW_PRESS) {
-	angleRotate_X += 0.01;
-    } else if (glfwGetKey(window, GLFW_KEY_K ) == GLFW_PRESS) {
-	angleRotate_X -= 0.01;
+      Incre = 0;
     } else if ( glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS ){
-      deca_X-=0.1;
+      if (Rotate_Sens) Incre += -0.001;
+	cout << "hey" << endl;
+      Rotate_Sens = true;
     } else if ( glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS ){
 //&& SMOOTHING_VALS<32){
-      deca_X+=0.1;
+      if (!Rotate_Sens) Incre += 0.001;
+      Rotate_Sens = false;
     } else if ( glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS ){
 //&& SMOOTHING_VOLS>1){
 	deca_Z +=0.1;
