@@ -62,21 +62,35 @@ float gaussian( float x, float mu, float sigma ) {
 
 // compute a 1D kernel of gauss numbers
 vector<float> computeGaussianKernel(int kernelRadius){
-  vector<float> kernel(kernelRadius*2);
-
-  //TO DO
-
+  vector<float> kernel(kernelRadius*2+1);
+	for (int i = 0; i < kernelRadius*2+1;i++)
+		kernel[i] = gaussian(i, kernelRadius, 1);
   return kernel;
 }
 
 
 vector<float> smoothData(vector<float> &data, vector<float> &kernel){
+  cout << "hey" << endl;
   vector<float> smoothdata(data.size());
   vector<float> sums(data.size());
-
-  // TO DO
-
+  for (int i = 0; i < data.size(); i++) sums[i] = 0;
+  for (int i = 0; i < data.size(); i++){
+	   int j = i-(kernel.size()-1)/2;
+	   int cpt = 0;
+	   while ( j > 0 && j < i+(kernel.size()-1)/2 && j < data.size() && cpt < kernel.size()){
+		   sums[j] += kernel[cpt]*data[j];
+		  cpt ++;
+	   }
+  }
+  for (int i = 0; i < data.size(); i++){
+	/**if (i < kernel.size()/2 || i > data.size()-kernel.size()/2){
+		sums[j] = sums[j]/(...);
+	} else **/
+		sums[i] = sums[i]/kernel.size();
+    //cout << sums[i] << endl;
+  }
   return smoothdata;
+
 }
 
 
@@ -219,16 +233,15 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDA){
 	int size_draw = 2*3*3*(N-1);
   GLfloat g_vertex_buffer_dataA[size_draw];//+4*3*3];
-  GLfloat g_vertex_normal_dataA[size_draw];//+4*3*3];
-  GLfloat g_vertex_color_dataA[size_draw];
+  GLfloat g_vertex_normal_dataA[(N-1)*3];//+4*3*3];
+  GLfloat g_vertex_color_dataA[size_draw]; //On a besoin de une normale pour deux triangles et donc 3 coordo pour definir cette normale
 
   for(int i=0; i<size_draw; i++){
     g_vertex_buffer_dataA[i] = 0.654321;
     g_vertex_color_dataA[i]  = 0.654321;
-	g_vertex_normal_dataA[i] = 0.0f;
   }
   for (int i=0; i<N-1; i++){
-	
+
   float couleur_R = 0;
   float couleur_G = 0;
   float couleur_B = 0;
@@ -238,36 +251,50 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 		couleur_R = 0.5f;
 		couleur_G = 0.5f;
 		couleur_B = 0.5f;
-	} else 
+	} else
 		couleur_R = 1.0f;
 	float distance = i/2000.0;
 float distance1 = (i+1)/2000.0;
 	float rootActExch = sqrt(vecVols[i]);
 	float rootActExch1 = sqrt(vecVols[i+1]);
 
-	g_vertex_buffer_dataA[18*i + 0] = distance;
+	g_vertex_buffer_dataA[18*i + 0] = distance; //A
 	g_vertex_buffer_dataA[18*i + 1] = 0.0f+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 2] = vecVals[i];
 
-	g_vertex_buffer_dataA[18*i + 3] = distance;
+	g_vertex_buffer_dataA[18*i + 3] = distance; //B
 	g_vertex_buffer_dataA[18*i + 4] = rootActExch+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 5] = vecVals[i];
 
-	g_vertex_buffer_dataA[18*i + 6] = distance1;
+	g_vertex_buffer_dataA[18*i + 6] = distance1; //C
 	g_vertex_buffer_dataA[18*i + 7] = 0.0f+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 8] = vecVals[i+1];
 
-	g_vertex_buffer_dataA[18*i + 9] = distance;
+	g_vertex_buffer_dataA[18*i + 9] = distance; //B
 	g_vertex_buffer_dataA[18*i + 10] = rootActExch+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 11] = vecVals[i];
 
-	g_vertex_buffer_dataA[18*i + 12] = distance1;
+	g_vertex_buffer_dataA[18*i + 12] = distance1; //C
 	g_vertex_buffer_dataA[18*i + 13] = 0.0f+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 14] = vecVals[i+1];
 
-	g_vertex_buffer_dataA[18*i + 15] = distance1;
+	g_vertex_buffer_dataA[18*i + 15] = distance1; //D
 	g_vertex_buffer_dataA[18*i + 16] = rootActExch1+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 17] = vecVals[i+1];
+
+	float AC[3];
+	AC[0] = g_vertex_buffer_dataA[18*i + 6] - g_vertex_buffer_dataA[18*i + 0];
+	AC[1] = g_vertex_buffer_dataA[18*i + 7] - g_vertex_buffer_dataA[18*i + 1];
+	AC[2] = g_vertex_buffer_dataA[18*i + 8] - g_vertex_buffer_dataA[18*i + 2];
+
+	float AB[3];
+	AB[0] = g_vertex_buffer_dataA[18*i + 9] - g_vertex_buffer_dataA[18*i + 0];
+	AB[1] = g_vertex_buffer_dataA[18*i + 10] - g_vertex_buffer_dataA[18*i + 1];
+	AB[2] = g_vertex_buffer_dataA[18*i + 11] - g_vertex_buffer_dataA[18*i + 2];
+	//On fait AC*AB
+	g_vertex_normal_dataA[3*i + 0] = (AC[1]*AB[2]) - (AC[2]*AB[1]);
+	g_vertex_normal_dataA[3*i + 1] = (AC[0]*AB[2]) - (AC[2]*AB[0]);
+	g_vertex_normal_dataA[3*i + 2] = (AC[0]*AB[1]) - (AC[1]*AB[0]);
 
 	g_vertex_color_dataA[18*i + 0] = couleur_R;
 	g_vertex_color_dataA[18*i + 1] = couleur_G;
@@ -292,7 +319,6 @@ float distance1 = (i+1)/2000.0;
 	g_vertex_color_dataA[18*i + 15] = couleur_R;
 	g_vertex_color_dataA[18*i + 16] = couleur_G;
 	g_vertex_color_dataA[18*i + 17] = couleur_B;
-
   }
 	profondeur_A+=1;
 
@@ -480,7 +506,7 @@ g_vertex_buffer_dataB[size_draw+0] = 0.0;
 
 profondeur_B+=1;
   // ???
-  
+
   for(int i=0; i<size_draw; i++)
     if (g_vertex_buffer_dataB[i] > 0.654320 && g_vertex_buffer_dataB[i] < 0.654322)
       cout << i<<" EVIL IS IN THE DETAIL !" << endl ;
@@ -546,6 +572,9 @@ int main(){
   loadData("data/MSFT.csv",  vols40, vals40);
   N = vals10.size()-3;
 
+  vals10 = smoothData(vals10, kernel0);
+  //vols10 = smoothData(vols10, kernel0);
+
   glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // On veut OpenGL 3.3
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -596,7 +625,7 @@ int main(){
 
   int m11 = loadModelA(vols10, vals10, VertexArrayIDA1);
   int m12 = loadModelB(vols10, vals10, VertexArrayIDB1);
- 
+
   int m21 = loadModelA(vols20, vals20, VertexArrayIDA2);
   int m22 = loadModelB(vols20, vals20, VertexArrayIDB2);
 
@@ -620,7 +649,7 @@ double angle = 0.0;
 bool Rotate_Sens = false;
 float Incre = 0.01;
 
-	
+
 	float angleRotate_X = 0;
 	float angleRotate_Y = 0;
 	float angleRotate_Z = 0;
@@ -645,7 +674,7 @@ float Incre = 0.01;
                                   vec3(0, 0, 0), //where it looks
                                   vec3(0, 0, 1) // head is up
                                 );
-    
+
 mat4 rotation_X = glm::mat4(1.0f); //Cree la matrice identite
 	rotation_X[1][1] = cos(angleRotate_X);
 	rotation_X[1][2] = -sin(angleRotate_X);
@@ -668,7 +697,7 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
     modelMatrixA          =  translate(modelMatrixA, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
     mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     modelMatrixB          =  translate(modelMatrixB, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
-	
+
 
 
     // on envoie les valeurs uniforme aux shaders
@@ -688,7 +717,7 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
 
     glBindVertexArray(VertexArrayIDA4);
     glDrawArrays(GL_TRIANGLES, 0, m41);
-	
+
 
     glUseProgram(ProgramB);
     glUniformMatrix4fv(uniform_viewB,  1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -733,11 +762,16 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
 //&& SMOOTHING_VALS<32){
       if (!Rotate_Sens) Incre += 0.001;
       Rotate_Sens = false;
-    } else if ( glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS ){
-//&& SMOOTHING_VOLS>1){
-	deca_Z +=0.1;
-    } else if ( glfwGetKey(window, GLFW_KEY_UP ) == GLFW_PRESS ){//&& SMOOTHING_VOLS<32){
-        deca_Z -=0.1;
+    } else if ( glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS && SMOOTHING_VALS>1){
+      cout << SMOOTHING_VALS << endl;
+      SMOOTHING_VALS--;
+      vector<float> kernel = computeGaussianKernel(SMOOTHING_VALS);
+      vals10 = smoothData(vals10,kernel);
+    } else if ( glfwGetKey(window, GLFW_KEY_UP ) == GLFW_PRESS && SMOOTHING_VALS<32){
+      cout << SMOOTHING_VALS << endl;
+      SMOOTHING_VALS++;
+      vector<float> kernel = computeGaussianKernel(SMOOTHING_VALS);
+      vals10 = smoothData(vals10,kernel);
     }
 
   } // Vérifie si on a appuyé sur la touche échap (ESC) ou si la fenêtre a été fermée
