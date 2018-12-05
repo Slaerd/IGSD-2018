@@ -46,8 +46,10 @@ float nbBands = 8.0f;
 
 int N = 4;
 
-int profondeur_A = -2;
-int profondeur_B = -2;
+int profondeur_min = -2;
+float profondeur_incre = 1.0f;
+int profondeur_A = profondeur_min;
+int profondeur_B = profondeur_min;
 
 int SMOOTHING_VALS = 1;
 int SMOOTHING_VOLS = 1;
@@ -102,7 +104,9 @@ void loadData(string filename, vector<float> &vols, vector<float> &vals){
   float minvol = INT_MAX;
   float maxval = INT_MIN;
   float maxvol = INT_MIN;
+
 	int cpt = 0;
+
   while ( file.good() ) {
     getline(file,value, ',');
 	  if (cpt==5){
@@ -121,15 +125,18 @@ void loadData(string filename, vector<float> &vols, vector<float> &vals){
 		}
 		cpt++;
   }
+
   // on rajoute 2 fausses valeurs a la fin que l'on affichera pas .. mais qu'on utilisera pour normaliser !
   vals.push_back(minval);
   vals.push_back(maxval);
   vols.push_back(minvol);
   vols.push_back(maxvol);
+
 	for (int i = 0; i < vals.size(); i++){
 		vals[i] = vals[i]/maxval;
 		vols[i] = vols[i]/maxvol;
 	}
+
 }
 
 
@@ -244,13 +251,14 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   float couleur_R = 0;
   float couleur_G = 0;
   float couleur_B = 0;
-	if (vecVals[i] < 0.5)
-		couleur_R = 1.0f;
-	else {
-		couleur_G = 1.0f;
-	}
+
+	if (vecVals[i] < 0.5) couleur_R = 1.0f;
+
+	else couleur_G = 1.0f;
+
 	float distance = i/2000.0;
-float distance1 = (i+1)/2000.0;
+  float distance1 = (i+1)/2000.0;
+
 	float rootActExch = sqrt(vecVols[i]);
 	float rootActExch1 = sqrt(vecVols[i+1]);
 
@@ -316,7 +324,7 @@ float distance1 = (i+1)/2000.0;
 	g_vertex_color_dataA[18*i + 16] = couleur_G;
 	g_vertex_color_dataA[18*i + 17] = couleur_B;
   }
-	profondeur_A+=1;
+	profondeur_A+=profondeur_incre;
 
   // on teste s'il ne reste pas notre valeur bizarre dans le tableau = on a pas oublie de cases !
   for(int i=0; i<size_draw; i++)
@@ -392,15 +400,17 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   //cout<< "loadModelB " << (sizeof(g_vertex_buffer_dataB)/(sizeof(float)))<<" % "<<(3*3*4*(N))<<endl;
   for(int i=0; i<size_draw; i++){
     g_vertex_buffer_dataB[i] = 0.654321;
-	g_vertex_color_dataB[i] = 0.654321;
-}
+	  g_vertex_color_dataB[i] = 0.654321;
+  }
 
   // on rajoute des faces et de la hauteur a notre figure
   for (int i=0; i<N-1; i++){
-	float distance = i/2000.0;
-	float distance1 = (i+1)/2000.0;
-	float rootActExch = sqrt(vecVols[i]);
-	float rootActExch1 = sqrt(vecVols[i+1]);
+	  float distance = i/2000.0;
+	  float distance1 = (i+1)/2000.0;
+
+    float rootActExch = sqrt(vecVols[i]);
+	  float rootActExch1 = sqrt(vecVols[i+1]);
+
     g_vertex_buffer_dataB[36*i + 0] = distance;
     g_vertex_buffer_dataB[36*i + 1] = 0.0f+profondeur_B;
     g_vertex_buffer_dataB[36*i + 2] = vecVals[i];
@@ -449,58 +459,59 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
     g_vertex_buffer_dataB[36*i + 34] = rootActExch1+profondeur_B;
     g_vertex_buffer_dataB[36*i + 35] = 0.0f;
   }
-float distance_max = (N-1)/2000.0;
-float rootActExch0 = sqrt(vecVols[0]);
-float rootActExchmax = sqrt(vecVols[N-1]);
-g_vertex_buffer_dataB[size_draw+0] = 0.0;
-    g_vertex_buffer_dataB[size_draw+1] = 0.0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+2] = vecVals[0];
+  float distance_max = (N-1)/2000.0;
+  float rootActExch0 = sqrt(vecVols[0]);
+  float rootActExchmax = sqrt(vecVols[N-1]);
 
-    g_vertex_buffer_dataB[size_draw+3] = 0.0;
-    g_vertex_buffer_dataB[size_draw+4] = 0.0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+5] = 0.0;
+  g_vertex_buffer_dataB[size_draw+0] = 0.0;
+  g_vertex_buffer_dataB[size_draw+1] = 0.0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+2] = vecVals[0];
 
-    g_vertex_buffer_dataB[size_draw+6] = 0.0;
-    g_vertex_buffer_dataB[size_draw+7] = rootActExch0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+8] = 0.0;
+  g_vertex_buffer_dataB[size_draw+3] = 0.0;
+  g_vertex_buffer_dataB[size_draw+4] = 0.0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+5] = 0.0;
 
-    g_vertex_buffer_dataB[size_draw+9] = 0.0;
-    g_vertex_buffer_dataB[size_draw+10] = 0.0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+11] = vecVals[0];
+  g_vertex_buffer_dataB[size_draw+6] = 0.0;
+  g_vertex_buffer_dataB[size_draw+7] = rootActExch0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+8] = 0.0;
 
-    g_vertex_buffer_dataB[size_draw+12] = 0.0;
-    g_vertex_buffer_dataB[size_draw+13] = rootActExch0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+14] = 0.0;
+  g_vertex_buffer_dataB[size_draw+9] = 0.0;
+  g_vertex_buffer_dataB[size_draw+10] = 0.0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+11] = vecVals[0];
 
-    g_vertex_buffer_dataB[size_draw+15] = 0.0;
-    g_vertex_buffer_dataB[size_draw+16] = rootActExch0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+17] = vecVals[0];
+  g_vertex_buffer_dataB[size_draw+12] = 0.0;
+  g_vertex_buffer_dataB[size_draw+13] = rootActExch0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+14] = 0.0;
 
-    g_vertex_buffer_dataB[size_draw+18] = distance_max;
-    g_vertex_buffer_dataB[size_draw+19] = 0.0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+20] = vecVals[N-1];
+  g_vertex_buffer_dataB[size_draw+15] = 0.0;
+  g_vertex_buffer_dataB[size_draw+16] = rootActExch0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+17] = vecVals[0];
 
-    g_vertex_buffer_dataB[size_draw+21] = distance_max;
-    g_vertex_buffer_dataB[size_draw+22] = 0.0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+23] = 0.0;
+  g_vertex_buffer_dataB[size_draw+18] = distance_max;
+  g_vertex_buffer_dataB[size_draw+19] = 0.0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+20] = vecVals[N-1];
 
-    g_vertex_buffer_dataB[size_draw+24] = distance_max;
-    g_vertex_buffer_dataB[size_draw+25] = rootActExchmax+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+26] = 0.0;
+  g_vertex_buffer_dataB[size_draw+21] = distance_max;
+  g_vertex_buffer_dataB[size_draw+22] = 0.0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+23] = 0.0;
 
-    g_vertex_buffer_dataB[size_draw+27] = distance_max;
-    g_vertex_buffer_dataB[size_draw+28] = 0.0+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+29] = vecVals[N-1];
+  g_vertex_buffer_dataB[size_draw+24] = distance_max;
+  g_vertex_buffer_dataB[size_draw+25] = rootActExchmax+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+26] = 0.0;
 
-    g_vertex_buffer_dataB[size_draw+30] = distance_max;
-    g_vertex_buffer_dataB[size_draw+31] = rootActExchmax+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+32] = 0.0;
+  g_vertex_buffer_dataB[size_draw+27] = distance_max;
+  g_vertex_buffer_dataB[size_draw+28] = 0.0+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+29] = vecVals[N-1];
 
-    g_vertex_buffer_dataB[size_draw+33] = distance_max;
-    g_vertex_buffer_dataB[size_draw+34] = rootActExchmax+profondeur_B;
-    g_vertex_buffer_dataB[size_draw+35] = vecVals[N-1];
+  g_vertex_buffer_dataB[size_draw+30] = distance_max;
+  g_vertex_buffer_dataB[size_draw+31] = rootActExchmax+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+32] = 0.0;
 
-profondeur_B+=1;
+  g_vertex_buffer_dataB[size_draw+33] = distance_max;
+  g_vertex_buffer_dataB[size_draw+34] = rootActExchmax+profondeur_B;
+  g_vertex_buffer_dataB[size_draw+35] = vecVals[N-1];
+
+  profondeur_B+=profondeur_incre;
   // ???
 
   for(int i=0; i<size_draw; i++)
@@ -646,11 +657,11 @@ int main(){
   GLuint ProgramB        = LoadShaders( "projet2018B.vs", "projet2018B.fs" );
 	GLint  uniform_projectionB     = glGetUniformLocation(ProgramB, "projectionMatrix");
   GLint  uniform_viewB     = glGetUniformLocation(ProgramB, "viewMatrix");
-GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
+  GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 
-double angle = 0.0;
-bool Rotate_Sens = false;
-float Incre = 0.01;
+  double angle = 0.0;
+  bool Rotate_Sens = false;
+  float Incre = 0.01;
 
 
 	float angleRotate_X = 0;
@@ -660,6 +671,7 @@ float Incre = 0.01;
 	float deca_X = 0;
 	float deca_Y = 0;
 	float deca_Z = 0;
+
   do {
     // clear before every draw
     glClearColor( 1.0, 1.0, 1.0, 1.0);
@@ -678,23 +690,23 @@ float Incre = 0.01;
                                   vec3(0, 0, 1) // head is up
                                 );
 
-mat4 rotation_X = glm::mat4(1.0f); //Cree la matrice identite
-	rotation_X[1][1] = cos(angleRotate_X);
-	rotation_X[1][2] = -sin(angleRotate_X);
-	rotation_X[2][1] = sin(angleRotate_X);
-	rotation_X[2][2] = cos(angleRotate_X);
+    mat4 rotation_X = glm::mat4(1.0f); //Cree la matrice identite
+	  rotation_X[1][1] = cos(angleRotate_X);
+	  rotation_X[1][2] = -sin(angleRotate_X);
+	  rotation_X[2][1] = sin(angleRotate_X);
+	  rotation_X[2][2] = cos(angleRotate_X);
 
-mat4 rotation_Y = glm::mat4(1.0f); //Cree la matrice identite
-	rotation_Y[0][0] = cos(angleRotate_Y);
-	rotation_Y[0][2] = sin(angleRotate_Y);
-	rotation_Y[2][0] = -sin(angleRotate_Y);
-	rotation_Y[2][2] = cos(angleRotate_Y);
+    mat4 rotation_Y = glm::mat4(1.0f); //Cree la matrice identite
+	  rotation_Y[0][0] = cos(angleRotate_Y);
+	  rotation_Y[0][2] = sin(angleRotate_Y);
+	  rotation_Y[2][0] = -sin(angleRotate_Y);
+	  rotation_Y[2][2] = cos(angleRotate_Y);
 
-mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
-	rotation_Z[0][0] = cos(angleRotate_Z);
-	rotation_Z[0][1] = -sin(angleRotate_Z);
-	rotation_Z[1][0] = sin(angleRotate_Z);
-	rotation_Z[1][1] = cos(angleRotate_Z);
+    mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
+	  rotation_Z[0][0] = cos(angleRotate_Z);
+	  rotation_Z[0][1] = -sin(angleRotate_Z);
+	  rotation_Z[1][0] = sin(angleRotate_Z);
+	  rotation_Z[1][1] = cos(angleRotate_Z);
 
     mat4 modelMatrixA     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     modelMatrixA          =  translate(modelMatrixA, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
@@ -748,7 +760,7 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
     // Swap buffers
     glfwSwapBuffers(window);
     glfwPollEvents();
-	//std::cout << "X = "<< camPos[0] << "; Y = " << camPos[1] << "; Z = " << camPos[2] << endl;
+
     if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
       //TODO
     } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
@@ -777,8 +789,8 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
       vector<float> vols20_Smoothed = smoothData(vols20,kernel);
       vector<float> vols30_Smoothed = smoothData(vols30,kernel);
       vector<float> vols40_Smoothed = smoothData(vols40,kernel);
-      profondeur_A = -2;
-      profondeur_B = -2;
+      profondeur_A = profondeur_min;
+      profondeur_B = profondeur_min;
       m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
       m12 = loadModelB(vols10_Smoothed, vals10_Smoothed, VertexArrayIDB1);
       m21 = loadModelA(vols20_Smoothed, vals20_Smoothed, VertexArrayIDA2);
@@ -799,8 +811,8 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
       vector<float> vols20_Smoothed = smoothData(vols20,kernel);
       vector<float> vols30_Smoothed = smoothData(vols30,kernel);
       vector<float> vols40_Smoothed = smoothData(vols40,kernel);
-      profondeur_A = -2;
-      profondeur_B = -2;
+      profondeur_A = profondeur_min;
+      profondeur_B = profondeur_min;
       m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
       m12 = loadModelB(vols10_Smoothed, vals10_Smoothed, VertexArrayIDB1);
       m21 = loadModelA(vols20_Smoothed, vals20_Smoothed, VertexArrayIDA2);
