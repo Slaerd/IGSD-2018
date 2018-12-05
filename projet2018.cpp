@@ -64,30 +64,29 @@ float gaussian( float x, float mu, float sigma ) {
 vector<float> computeGaussianKernel(int kernelRadius){
   vector<float> kernel(kernelRadius*2+1);
 	for (int i = 0; i < kernelRadius*2+1;i++)
-		kernel[i] = gaussian(i, kernelRadius, 1);
+		kernel[i] = gaussian(i-kernelRadius, 0, kernelRadius);
   return kernel;
 }
 
 
 vector<float> smoothData(vector<float> &data, vector<float> &kernel){
-  cout << "hey" << endl;
   vector<float> smoothdata(data.size());
   vector<float> sums(data.size());
-  for (int i = 0; i < data.size(); i++) sums[i] = 0;
   for (int i = 0; i < data.size(); i++){
 	   int j = i-(kernel.size()-1)/2;
 	   int cpt = 0;
-	   while ( j > 0 && j < i+(kernel.size()-1)/2 && j < data.size() && cpt < kernel.size()){
-		   sums[j] += kernel[cpt]*data[j];
-		  cpt ++;
+     float valeur_used = 0;
+     while(j<0){
+       cpt++;
+       j++;
+     }
+	   while ( j < data.size() && cpt < kernel.size()){
+       sums[i] += kernel[cpt]*data[j];
+		   cpt++;
+       j++;
+       valeur_used++;
 	   }
-  }
-  for (int i = 0; i < data.size(); i++){
-	/**if (i < kernel.size()/2 || i > data.size()-kernel.size()/2){
-		sums[j] = sums[j]/(...);
-	} else **/
-		sums[i] = sums[i]/kernel.size();
-    //cout << sums[i] << endl;
+     smoothdata[i] = sums[i]/valeur_used;
   }
   return smoothdata;
 
@@ -245,14 +244,11 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   float couleur_R = 0;
   float couleur_G = 0;
   float couleur_B = 0;
-	if (vecVals[i] < vecVals[i+1])
-		couleur_G = 1.0f;
-	else if (vecVals[i] == vecVals[i+1]){
-		couleur_R = 0.5f;
-		couleur_G = 0.5f;
-		couleur_B = 0.5f;
-	} else
+	if (vecVals[i] < 0.5)
 		couleur_R = 1.0f;
+	else {
+		couleur_G = 1.0f;
+	}
 	float distance = i/2000.0;
 float distance1 = (i+1)/2000.0;
 	float rootActExch = sqrt(vecVols[i]);
@@ -572,8 +568,15 @@ int main(){
   loadData("data/MSFT.csv",  vols40, vals40);
   N = vals10.size()-3;
 
-  vals10 = smoothData(vals10, kernel0);
-  //vols10 = smoothData(vols10, kernel0);
+  vector<float> kernel = computeGaussianKernel(SMOOTHING_VALS);
+  vector<float> vals10_Smoothed = smoothData(vals10,kernel);
+  vector<float> vals20_Smoothed = smoothData(vals20,kernel);
+  vector<float> vals30_Smoothed = smoothData(vals30,kernel);
+  vector<float> vals40_Smoothed = smoothData(vals40,kernel);
+  vector<float> vols10_Smoothed = smoothData(vols10,kernel);
+  vector<float> vols20_Smoothed = smoothData(vols20,kernel);
+  vector<float> vols30_Smoothed = smoothData(vols30,kernel);
+  vector<float> vols40_Smoothed = smoothData(vols40,kernel);
 
   glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // On veut OpenGL 3.3
@@ -623,17 +626,17 @@ int main(){
   glGenVertexArrays(1, &VertexArrayIDA4);
   glGenVertexArrays(1, &VertexArrayIDB4);
 
-  int m11 = loadModelA(vols10, vals10, VertexArrayIDA1);
-  int m12 = loadModelB(vols10, vals10, VertexArrayIDB1);
+  int m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
+  int m12 = loadModelB(vols10_Smoothed, vals10_Smoothed, VertexArrayIDB1);
 
-  int m21 = loadModelA(vols20, vals20, VertexArrayIDA2);
-  int m22 = loadModelB(vols20, vals20, VertexArrayIDB2);
+  int m21 = loadModelA(vols20_Smoothed, vals20_Smoothed, VertexArrayIDA2);
+  int m22 = loadModelB(vols20_Smoothed, vals20_Smoothed, VertexArrayIDB2);
 
-  int m31 = loadModelA(vols30, vals30, VertexArrayIDA3);
-  int m32 = loadModelB(vols30, vals30, VertexArrayIDB3);
+  int m31 = loadModelA(vols30_Smoothed, vals30_Smoothed, VertexArrayIDA3);
+  int m32 = loadModelB(vols30_Smoothed, vals30_Smoothed, VertexArrayIDB3);
 
-  int m41 = loadModelA(vols40, vals40, VertexArrayIDA4);
-  int m42 = loadModelB(vols40, vals40, VertexArrayIDB4);
+  int m41 = loadModelA(vols40_Smoothed, vals40_Smoothed, VertexArrayIDA4);
+  int m42 = loadModelB(vols40_Smoothed, vals40_Smoothed, VertexArrayIDB4);
 
   GLuint ProgramA        = LoadShaders( "projet2018A.vs", "projet2018A.fs" );
   GLint  uniform_projection     = glGetUniformLocation(ProgramA, "projectionMatrix");
@@ -750,28 +753,62 @@ mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
       //TODO
     } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
       //TODO
+      deca_Z -=0.1;
     } else if (glfwGetKey(window, GLFW_KEY_R ) == GLFW_PRESS){
-      //TODO
+      deca_Z +=0.1;
     } else if (glfwGetKey(window, GLFW_KEY_F ) == GLFW_PRESS){
       Incre = 0;
     } else if ( glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS ){
       if (Rotate_Sens) Incre += -0.001;
-	cout << "hey" << endl;
       Rotate_Sens = true;
     } else if ( glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS ){
 //&& SMOOTHING_VALS<32){
       if (!Rotate_Sens) Incre += 0.001;
       Rotate_Sens = false;
     } else if ( glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS && SMOOTHING_VALS>1){
-      cout << SMOOTHING_VALS << endl;
+      //cout << SMOOTHING_VALS << endl;
       SMOOTHING_VALS--;
       vector<float> kernel = computeGaussianKernel(SMOOTHING_VALS);
-      vals10 = smoothData(vals10,kernel);
+      vector<float> vals10_Smoothed = smoothData(vals10,kernel);
+      vector<float> vals20_Smoothed = smoothData(vals20,kernel);
+      vector<float> vals30_Smoothed = smoothData(vals30,kernel);
+      vector<float> vals40_Smoothed = smoothData(vals40,kernel);
+      vector<float> vols10_Smoothed = smoothData(vols10,kernel);
+      vector<float> vols20_Smoothed = smoothData(vols20,kernel);
+      vector<float> vols30_Smoothed = smoothData(vols30,kernel);
+      vector<float> vols40_Smoothed = smoothData(vols40,kernel);
+      profondeur_A = -2;
+      profondeur_B = -2;
+      m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
+      m12 = loadModelB(vols10_Smoothed, vals10_Smoothed, VertexArrayIDB1);
+      m21 = loadModelA(vols20_Smoothed, vals20_Smoothed, VertexArrayIDA2);
+      m22 = loadModelB(vols20_Smoothed, vals20_Smoothed, VertexArrayIDB2);
+      m31 = loadModelA(vols30_Smoothed, vals30_Smoothed, VertexArrayIDA3);
+      m32 = loadModelB(vols30_Smoothed, vals30_Smoothed, VertexArrayIDB3);
+      m41 = loadModelA(vols40_Smoothed, vals40_Smoothed, VertexArrayIDA4);
+      m42 = loadModelB(vols40_Smoothed, vals40_Smoothed, VertexArrayIDB4);
     } else if ( glfwGetKey(window, GLFW_KEY_UP ) == GLFW_PRESS && SMOOTHING_VALS<32){
-      cout << SMOOTHING_VALS << endl;
+      //cout << SMOOTHING_VALS << endl;
       SMOOTHING_VALS++;
       vector<float> kernel = computeGaussianKernel(SMOOTHING_VALS);
-      vals10 = smoothData(vals10,kernel);
+      vector<float> vals10_Smoothed = smoothData(vals10,kernel);
+      vector<float> vals20_Smoothed = smoothData(vals20,kernel);
+      vector<float> vals30_Smoothed = smoothData(vals30,kernel);
+      vector<float> vals40_Smoothed = smoothData(vals40,kernel);
+      vector<float> vols10_Smoothed = smoothData(vols10,kernel);
+      vector<float> vols20_Smoothed = smoothData(vols20,kernel);
+      vector<float> vols30_Smoothed = smoothData(vols30,kernel);
+      vector<float> vols40_Smoothed = smoothData(vols40,kernel);
+      profondeur_A = -2;
+      profondeur_B = -2;
+      m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
+      m12 = loadModelB(vols10_Smoothed, vals10_Smoothed, VertexArrayIDB1);
+      m21 = loadModelA(vols20_Smoothed, vals20_Smoothed, VertexArrayIDA2);
+      m22 = loadModelB(vols20_Smoothed, vals20_Smoothed, VertexArrayIDB2);
+      m31 = loadModelA(vols30_Smoothed, vals30_Smoothed, VertexArrayIDA3);
+      m32 = loadModelB(vols30_Smoothed, vals30_Smoothed, VertexArrayIDB3);
+      m41 = loadModelA(vols40_Smoothed, vals40_Smoothed, VertexArrayIDA4);
+      m42 = loadModelB(vols40_Smoothed, vals40_Smoothed, VertexArrayIDB4);
     }
 
   } // Vérifie si on a appuyé sur la touche échap (ESC) ou si la fenêtre a été fermée
