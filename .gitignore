@@ -1,4 +1,5 @@
 *.o
 *.exe
 Projet2018
+*.png
 data/
