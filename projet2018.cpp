@@ -481,7 +481,8 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
       GL_FLOAT,
       GL_FALSE,
       0,
-      (void*)sizeof(g_vertex_buffer_dataA));
+      (void*)sizeof(g_vertex_buffer_dataA)
+    );
     glEnableVertexAttribArray(1);
 
     glVertexAttribPointer( // same thing for the normals
@@ -490,9 +491,9 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
       GL_FLOAT,
       GL_FALSE,
       0,
-      (void*)(sizeof(g_vertex_buffer_dataA)+sizeof(g_vertex_color_dataA)));
+      (void*)(sizeof(g_vertex_buffer_dataA)+sizeof(g_vertex_color_dataA))
+    );
     glEnableVertexAttribArray(2);
-
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -726,6 +727,8 @@ int main(){
 
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // Accept fragment if it closer to the camera than the former one
   glDepthFunc(GL_LESS);
@@ -771,6 +774,9 @@ int main(){
   GLint  uniform_viewB     = glGetUniformLocation(ProgramB, "viewMatrix");
   GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 
+  GLint uniform_vecViewA = glGetUniformLocation(ProgramA, "vecViewA");
+  GLint uniform_vecViewB = glGetUniformLocation(ProgramB, "vecViewB");
+
   double angle = 0.0;
   bool Rotate_Sens = false;
   float Incre = 0.01;
@@ -791,11 +797,12 @@ int main(){
 
     // Use our shader program
     glUseProgram(ProgramA);
-    angle += Incre;
+    //angle += Incre;
     // onchange de matrice de projection : la projection orthogonale est plus propice a la visualization !
     //glm::mat4 projectionMatrix = glm::perspective(glm::radians(66.0f), 1024.0f / 768.0f, 0.1f, 200.0f);
     glm::mat4 projectionMatrix = glm::ortho( -1.0f, 1.0f, -1.0f, 1.0f, -6.f, 6.f );
     float camPos[3] = {5*cos(angle)+deca_X, 5*sin(angle), -.5+deca_Z};
+    //vec3 viewVec = vec3(5*cos(angle)+deca_X, 5*sin(angle), -.5+deca_Z);
     glm::mat4 viewMatrix       = glm::lookAt(
                                   glm::make_vec3(camPos), // where is the camara
                                   vec3(0, 0, 0), //where it looks
@@ -831,6 +838,7 @@ int main(){
     glUniformMatrix4fv(uniform_view,  1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(uniform_projection,1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(uniform_modelA,1, GL_FALSE, glm::value_ptr(modelMatrixA));
+    glUniform3f(uniform_vecViewA,-camPos[0],-camPos[1],-camPos[2]);
 
     // on re-active les VAO avant d'envoyer les buffers
     glBindVertexArray(VertexArrayIDA1);
@@ -873,7 +881,7 @@ int main(){
     glfwPollEvents();
 
     if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
-      //TODO
+      angle += 0.1f;
     } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
       //TODO
       deca_Z -=0.1;
