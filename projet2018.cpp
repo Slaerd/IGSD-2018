@@ -301,7 +301,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 					g_vertex_buffer_dataA[18*i + 11] - g_vertex_buffer_dataA[18*i + 2]);
 
   //Le produit vectoriel nous donne la normale
-	g_vertex_normal_faces[i] = normalize(cross(V1,V2));
+	g_vertex_normal_faces[i] = cross(V1,V2);
 
 	g_vertex_color_dataA[18*i + 0] = couleur_R;
 	g_vertex_color_dataA[18*i + 1] = couleur_G;
@@ -347,8 +347,8 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
 	//Normale de la premiere Face
     vec3 moyNormal0 = (g_vertex_normal_faces[0] + g_vertex_normal_faces[1])/2.0f; //On fait la moyenne de deux normales pour les points
-    moyNormal0 = normalize(moyNormal0);                                           //aux intersections de 2 rectangles
-  	g_vertex_normal_dataA[0] = g_vertex_normal_faces[0].x; //A
+                                                                                  //aux intersections de 2 rectangles
+  g_vertex_normal_dataA[0] = g_vertex_normal_faces[0].x; //A
 	g_vertex_normal_dataA[1] = g_vertex_normal_faces[0].y;
 	g_vertex_normal_dataA[2] = g_vertex_normal_faces[0].z;
 
@@ -377,8 +377,6 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   for(int i = 1; i < N-1-1; i++){
 		vec3 moyNormal1 = (g_vertex_normal_faces[i-1] + g_vertex_normal_faces[i])/2.0f;
 		vec3 moyNormal2 = (g_vertex_normal_faces[i] + g_vertex_normal_faces[i+1])/2.0f;
-		moyNormal1 = normalize(moyNormal1);
-		moyNormal2 = normalize(moyNormal2);
 
 		g_vertex_normal_dataA[18*i + 0] = moyNormal1.x; //A
 		g_vertex_normal_dataA[18*i + 1] = moyNormal1.y;
@@ -409,7 +407,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   	//Normale de la derniere face
 
   	moyNormal0 = (g_vertex_normal_faces[N-1-1] + g_vertex_normal_faces[N-1-2])/2.0f;
-  	moyNormal0 = normalize(moyNormal0);
+
   	g_vertex_normal_dataA[18*(N-1) - 18] = moyNormal0.x; //A
   	g_vertex_normal_dataA[18*(N-1) - 17] = moyNormal0.y;
   	g_vertex_normal_dataA[18*(N-1) - 16] = moyNormal0.z;
@@ -774,7 +772,7 @@ int main(){
   GLint  uniform_viewB     = glGetUniformLocation(ProgramB, "viewMatrix");
   GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 
-  GLint uniform_vecViewA = glGetUniformLocation(ProgramA, "vecViewA");
+  GLint uniform_vecViewA = glGetUniformLocation(ProgramA, "camPos");
   GLint uniform_vecViewB = glGetUniformLocation(ProgramB, "vecViewB");
 
   double angle = 0.0;
@@ -838,7 +836,7 @@ int main(){
     glUniformMatrix4fv(uniform_view,  1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(uniform_projection,1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(uniform_modelA,1, GL_FALSE, glm::value_ptr(modelMatrixA));
-    glUniform3f(uniform_vecViewA,-camPos[0],-camPos[1],-camPos[2]);
+    glUniform3f(uniform_vecViewA,camPos[0],camPos[1],camPos[2]);
 
     // on re-active les VAO avant d'envoyer les buffers
     glBindVertexArray(VertexArrayIDA1);
@@ -880,15 +878,15 @@ int main(){
     glfwSwapBuffers(window);
     glfwPollEvents();
 
-    if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
+    if (glfwGetKey(window, GLFW_KEY_S ) == GLFW_PRESS){
       angle += 0.1f;
     } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
       //TODO
       deca_Z -=0.1;
-    } else if (glfwGetKey(window, GLFW_KEY_R ) == GLFW_PRESS){
+    } else if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
       deca_Z +=0.1;
     } else if (glfwGetKey(window, GLFW_KEY_F ) == GLFW_PRESS){
-      Incre = 0;
+    angle += -0.1f;
     } else if ( glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS ){
       if (Rotate_Sens) Incre += -0.001;
       Rotate_Sens = true;
