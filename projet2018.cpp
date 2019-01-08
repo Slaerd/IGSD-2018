@@ -236,7 +236,7 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 
 int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDA){
-	int size_draw = 2*3*3*(N-1);
+    int size_draw = 2*3*3*(N-1);
   GLfloat g_vertex_buffer_dataA[size_draw]; //+ 9 Pour dessiner un triangle de test
   vector<vec3> g_vertex_normal_faces(N-1); //On a besoin d'une seule normale par rectangle
   GLfloat g_vertex_normal_dataA[size_draw]; //Ce tableau associe les normales moyennees a chaque point
@@ -262,7 +262,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	float rootActExch = glm::sqrt(vecVols[i]);
 	float rootActExch1 = glm::sqrt(vecVols[i+1]);
 
-  //Triangle 1
+    //Triangle 1
 
 	g_vertex_buffer_dataA[18*i + 0] = distance; //A
 	g_vertex_buffer_dataA[18*i + 1] = 0.0f+profondeur_A;
@@ -276,7 +276,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_buffer_dataA[18*i + 7] = 0.0f+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 8] = vecVals[i+1];
 
-  //Triangle 2
+    //Triangle 2
 
 	g_vertex_buffer_dataA[18*i + 9] = distance; //B
 	g_vertex_buffer_dataA[18*i + 10] = rootActExch+profondeur_A;
@@ -290,7 +290,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_buffer_dataA[18*i + 16] = rootActExch1+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 17] = vecVals[i+1];
 
-  //On recupere deux vecteurs d'une meme face
+    //On recupere deux vecteurs d'une meme face
 	vec3 V1 = vec3(	g_vertex_buffer_dataA[18*i + 6] - g_vertex_buffer_dataA[18*i + 0],
 					g_vertex_buffer_dataA[18*i + 7] - g_vertex_buffer_dataA[18*i + 1],
 					g_vertex_buffer_dataA[18*i + 8] - g_vertex_buffer_dataA[18*i + 2]
@@ -299,32 +299,8 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 					g_vertex_buffer_dataA[18*i + 10] - g_vertex_buffer_dataA[18*i + 1],
 					g_vertex_buffer_dataA[18*i + 11] - g_vertex_buffer_dataA[18*i + 2]);
 
-  //Le produit vectoriel nous donne la normale
+    //Le produit vectoriel nous donne la normale
 	g_vertex_normal_faces[i] = normalize(cross(V1,V2));
-
-    /*g_vertex_color_dataA[18*i + 0] = 1.0f;
-	g_vertex_color_dataA[18*i + 1] = .0;
-	g_vertex_color_dataA[18*i + 2] = .0;
-
-	g_vertex_color_dataA[18*i + 3] = 1.0f;
-	g_vertex_color_dataA[18*i + 4] = .0;
-	g_vertex_color_dataA[18*i + 5] = .0;
-
-	g_vertex_color_dataA[18*i + 6] = .0;
-	g_vertex_color_dataA[18*i + 7] = .0;
-	g_vertex_color_dataA[18*i + 8] = 1.0f;
-
-	g_vertex_color_dataA[18*i + 9] = 1.0f;
-	g_vertex_color_dataA[18*i + 10] = .0;
-	g_vertex_color_dataA[18*i + 11] = .0;
-
-	g_vertex_color_dataA[18*i + 12] = .0;
-	g_vertex_color_dataA[18*i + 13] = .0;
-	g_vertex_color_dataA[18*i + 14] = 1.0f;
-
-	g_vertex_color_dataA[18*i + 15] = 1.0f;
-	g_vertex_color_dataA[18*i + 16] = .0;
-	g_vertex_color_dataA[18*i + 17] = .0;*/
 
 	g_vertex_color_dataA[18*i + 0] = couleur_R;
 	g_vertex_color_dataA[18*i + 1] = couleur_G;
@@ -352,7 +328,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
 	}
 
-  //TEST TRIANGLE
+  //TEST TRIANGLE : AJOUTER + 9 A SIZEDRAW
 
   /*g_vertex_buffer_dataA[size_draw + 0] = 0;
   g_vertex_buffer_dataA[size_draw + 1] = profondeur_A;
@@ -536,7 +512,6 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   GLfloat g_vertex_buffer_dataB[size_draw+4*3*3];
 	GLfloat g_vertex_color_dataB[size_draw]; // 4 triangles of 3 points with 3 coordinates each
 
-  //cout<< "loadModelB " << (sizeof(g_vertex_buffer_dataB)/(sizeof(float)))<<" % "<<(3*3*4*(N))<<endl;
   for(int i=0; i<size_draw; i++){
     g_vertex_buffer_dataB[i] = 0.654321;
 	  g_vertex_color_dataB[i] = 0.654321;
@@ -652,7 +627,6 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
 
   profondeur_B+=profondeur_incre;
-  // ???
 
   for(int i=0; i<size_draw; i++)
     if (g_vertex_buffer_dataB[i] > 0.654320 && g_vertex_buffer_dataB[i] < 0.654322)
@@ -691,9 +665,6 @@ int main(){
   std::cout << std::setprecision(5) << std::fixed;
 
   vector<float> kernel0 = computeGaussianKernel(SMOOTHING_VALS);
-
-  for (int i = 0; i < kernel0.size(); i++)
-    cout << i<<": " << kernel0[i] << endl;
 
   // Initialise GLFW
   if( !glfwInit() ) {
@@ -801,14 +772,11 @@ int main(){
   GLint  uniform_viewB     = glGetUniformLocation(ProgramB, "viewMatrix");
   GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 
-  GLint uniform_camPos = glGetUniformLocation(ProgramA, "camPos");
-  GLint uniform_normal = glGetUniformLocation(ProgramA, "normalMatrix");
-
+  GLint uniform_camPos = glGetUniformLocation(ProgramA, "camPos"); //On a besoin des coordonnees camera pour la lumiere speculaire
 
   double angle = 0.0;
   bool Rotate_Sens = false;
   float Incre = 0.01;
-
 
 	float angleRotate_X = 0;
 	float angleRotate_Y = 0;
@@ -830,7 +798,6 @@ int main(){
     //glm::mat4 projectionMatrix = glm::perspective(glm::radians(66.0f), 1024.0f / 768.0f, 0.1f, 200.0f);
     glm::mat4 projectionMatrix = glm::ortho( -1.0f, 1.0f, -1.0f, 1.0f, -6.f, 6.f );
     float camPos[3] = {5*cos(angle)+deca_X, 5*sin(angle), -.5+deca_Z};
-    //vec3 viewVec = vec3(5*cos(angle)+deca_X, 5*sin(angle), -.5+deca_Z);
     glm::mat4 viewMatrix       = glm::lookAt(
                                   glm::make_vec3(camPos), // where is the camara
                                   vec3(0, 0, 0), //where it looks
@@ -860,14 +827,11 @@ int main(){
     mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     modelMatrixB          =  translate(modelMatrixB, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
 
-    mat3 normalMatrix = transpose(inverse(viewMatrix * modelMatrixA));
-
     // on envoie les valeurs uniforme aux shaders
     glUniformMatrix4fv(uniform_view,  1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(uniform_projection,1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(uniform_modelA,1, GL_FALSE, glm::value_ptr(modelMatrixA));
     glUniform3f(uniform_camPos,camPos[0],camPos[1],camPos[2]);
-    glUniformMatrix3fv(uniform_normal,1,GL_FALSE, glm::value_ptr(normalMatrix));
 
     // on re-active les VAO avant d'envoyer les buffers
     glBindVertexArray(VertexArrayIDA1);

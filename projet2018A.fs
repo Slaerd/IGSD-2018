@@ -1,10 +1,10 @@
 #version 330 core
 
 smooth in float depth;
-smooth in float depthOG;
 smooth in vec3 color;
 smooth in vec3 normal;
 out vec4 coloro;
+smooth in vec3 lightPos;
 smooth in vec3 lightDir1;
 smooth in vec3 lightDir2;
 smooth in vec3 lightDir3;
@@ -30,8 +30,8 @@ void main(){
         lightDir = lightPos[i];
         vec3 lightDirNorm = normalize(lightDir);    //Normalisation pour les produits scalaires
 
-        float intensity = max(max(0.1, 0.4/dot(lightDir,lightDir)),min(1.0,0.4/dot(lightDir,lightDir)));
-
+        float intensity = max(max(0.1, 0.4/dot(lightDir,lightDir)),min(1.0,0.4/dot(lightDir,lightDir))); //Pondere l'intensite de la lumiere avec la distance
+                                                                                                         //Renvoie <lightDir,lightDir> compris entre 0.1 et 1.0
         vec3 normalNorm = normalize(normal);
         vec3 camPosNorm = normalize(camPos);
 
@@ -39,7 +39,7 @@ void main(){
         lightReflect = normalize(lightReflect);
 
         float diffK = max(dot(lightDirNorm,normalNorm),.0);
-        diffuse += intensity * color * diffK;
+        diffuse += intensity * color * diffK;               //On somme les composantes calculees pour chaque source
 
         float specK = max(pow(dot(lightReflect,camPosNorm),21),.0);
         speculaire += intensity * white * specK;
