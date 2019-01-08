@@ -402,8 +402,6 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 		vec3 moyNormal1 = (g_vertex_normal_faces[i-1] + g_vertex_normal_faces[i])/2.0f;
 		vec3 moyNormal2 = (g_vertex_normal_faces[i] + g_vertex_normal_faces[i+1])/2.0f;
 
-        cout << "moyNormal1 : (" << moyNormal1.x << ", " << moyNormal1.y << ", " << moyNormal1.z << ")" << endl;
-        cout << "moyNormal2 : (" << moyNormal2.x << ", " << moyNormal2.y << ", " << moyNormal2.z << ")" << endl;
 		g_vertex_normal_dataA[18*i + 0] = moyNormal1.x; //A
 		g_vertex_normal_dataA[18*i + 1] = moyNormal1.y;
 		g_vertex_normal_dataA[18*i + 2] = moyNormal1.z;
@@ -798,8 +796,9 @@ int main(){
   GLint  uniform_viewB     = glGetUniformLocation(ProgramB, "viewMatrix");
   GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 
-  GLint uniform_vecViewA = glGetUniformLocation(ProgramA, "camPos");
-  GLint uniform_vecViewB = glGetUniformLocation(ProgramB, "vecViewB");
+  GLint uniform_camPos = glGetUniformLocation(ProgramA, "camPos");
+  GLint uniform_normal = glGetUniformLocation(ProgramA, "normalMatrix");
+
 
   double angle = 0.0;
   bool Rotate_Sens = false;
@@ -856,13 +855,14 @@ int main(){
     mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     modelMatrixB          =  translate(modelMatrixB, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
 
-
+    mat3 normalMatrix = transpose(inverse(viewMatrix * modelMatrixA));
 
     // on envoie les valeurs uniforme aux shaders
     glUniformMatrix4fv(uniform_view,  1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(uniform_projection,1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(uniform_modelA,1, GL_FALSE, glm::value_ptr(modelMatrixA));
-    glUniform3f(uniform_vecViewA,camPos[0],camPos[1],camPos[2]);
+    glUniform3f(uniform_camPos,camPos[0],camPos[1],camPos[2]);
+    glUniformMatrix3fv(uniform_normal,1,GL_FALSE, glm::value_ptr(normalMatrix));
 
     // on re-active les VAO avant d'envoyer les buffers
     glBindVertexArray(VertexArrayIDA1);
