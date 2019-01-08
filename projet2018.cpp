@@ -54,7 +54,6 @@ int profondeur_B = profondeur_min;
 int SMOOTHING_VALS = 1;
 int SMOOTHING_VOLS = 1;
 
-
 // gauss function
 float gaussian( float x, float mu, float sigma ) {
   const float a = ( x - mu ) / sigma;
@@ -238,10 +237,10 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDA){
 	int size_draw = 2*3*3*(N-1);
-  GLfloat g_vertex_buffer_dataA[size_draw + 9]; //+ 9 Pour dessiner un triangle de test
+  GLfloat g_vertex_buffer_dataA[size_draw]; //+ 9 Pour dessiner un triangle de test
   vector<vec3> g_vertex_normal_faces(N-1); //On a besoin d'une seule normale par rectangle
   GLfloat g_vertex_normal_dataA[size_draw]; //Ce tableau associe les normales moyennees a chaque point
-  GLfloat g_vertex_color_dataA[size_draw + 9];
+  GLfloat g_vertex_color_dataA[size_draw];
 
   for(int i=0; i<size_draw; i++){
     g_vertex_buffer_dataA[i] = 0.654321;
@@ -301,7 +300,31 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 					g_vertex_buffer_dataA[18*i + 11] - g_vertex_buffer_dataA[18*i + 2]);
 
   //Le produit vectoriel nous donne la normale
-	g_vertex_normal_faces[i] = cross(V1,V2);
+	g_vertex_normal_faces[i] = normalize(cross(V1,V2));
+
+    /*g_vertex_color_dataA[18*i + 0] = 1.0f;
+	g_vertex_color_dataA[18*i + 1] = .0;
+	g_vertex_color_dataA[18*i + 2] = .0;
+
+	g_vertex_color_dataA[18*i + 3] = 1.0f;
+	g_vertex_color_dataA[18*i + 4] = .0;
+	g_vertex_color_dataA[18*i + 5] = .0;
+
+	g_vertex_color_dataA[18*i + 6] = .0;
+	g_vertex_color_dataA[18*i + 7] = .0;
+	g_vertex_color_dataA[18*i + 8] = 1.0f;
+
+	g_vertex_color_dataA[18*i + 9] = 1.0f;
+	g_vertex_color_dataA[18*i + 10] = .0;
+	g_vertex_color_dataA[18*i + 11] = .0;
+
+	g_vertex_color_dataA[18*i + 12] = .0;
+	g_vertex_color_dataA[18*i + 13] = .0;
+	g_vertex_color_dataA[18*i + 14] = 1.0f;
+
+	g_vertex_color_dataA[18*i + 15] = 1.0f;
+	g_vertex_color_dataA[18*i + 16] = .0;
+	g_vertex_color_dataA[18*i + 17] = .0;*/
 
 	g_vertex_color_dataA[18*i + 0] = couleur_R;
 	g_vertex_color_dataA[18*i + 1] = couleur_G;
@@ -326,10 +349,12 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_color_dataA[18*i + 15] = couleur_R;
 	g_vertex_color_dataA[18*i + 16] = couleur_G;
 	g_vertex_color_dataA[18*i + 17] = couleur_B;
+
 	}
+
   //TEST TRIANGLE
 
-  g_vertex_buffer_dataA[size_draw + 0] = 1;
+  /*g_vertex_buffer_dataA[size_draw + 0] = 1;
   g_vertex_buffer_dataA[size_draw + 1] = profondeur_A;
   g_vertex_buffer_dataA[size_draw + 2] = 1 - 0.1;
   g_vertex_buffer_dataA[size_draw + 3] = 1;
@@ -343,7 +368,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
     g_vertex_color_dataA[size_draw + i] = 0.0f;
     g_vertex_color_dataA[size_draw + i + 1] = 0.0f;
     g_vertex_color_dataA[size_draw + i + 2] = 1.0f;
-  }
+}*/
 
 	//Normale de la premiere Face
     vec3 moyNormal0 = (g_vertex_normal_faces[0] + g_vertex_normal_faces[1])/2.0f; //On fait la moyenne de deux normales pour les points
@@ -359,7 +384,6 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_normal_dataA[6] = moyNormal0.x; //C
 	g_vertex_normal_dataA[7] = moyNormal0.y;
 	g_vertex_normal_dataA[8] = moyNormal0.z;
-
 
 	g_vertex_normal_dataA[9] = g_vertex_normal_faces[0].x; //B
 	g_vertex_normal_dataA[10] = g_vertex_normal_faces[0].y;
@@ -378,6 +402,8 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 		vec3 moyNormal1 = (g_vertex_normal_faces[i-1] + g_vertex_normal_faces[i])/2.0f;
 		vec3 moyNormal2 = (g_vertex_normal_faces[i] + g_vertex_normal_faces[i+1])/2.0f;
 
+        cout << "moyNormal1 : (" << moyNormal1.x << ", " << moyNormal1.y << ", " << moyNormal1.z << ")" << endl;
+        cout << "moyNormal2 : (" << moyNormal2.x << ", " << moyNormal2.y << ", " << moyNormal2.z << ")" << endl;
 		g_vertex_normal_dataA[18*i + 0] = moyNormal1.x; //A
 		g_vertex_normal_dataA[18*i + 1] = moyNormal1.y;
 		g_vertex_normal_dataA[18*i + 2] = moyNormal1.z;
