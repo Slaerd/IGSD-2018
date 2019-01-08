@@ -8,9 +8,13 @@ layout(location = 2) in vec3 vertexNormal_modelspace;
 // Sortie
 smooth out vec3 color;
 smooth out float depth;
+smooth out float depthOG;
 smooth out vec3 fragPos;
 smooth out vec3 normal;
-smooth out vec3 lightDir;
+smooth out vec3 lightDir1;
+smooth out vec3 lightDir2;
+smooth out vec3 lightDir3;
+smooth out vec3 lightDir4;
 
 // Params
 uniform mat4 modelMatrixA;
@@ -27,7 +31,14 @@ void main(){
   color       = vertexColor_modelspace;
   normal = vertexNormal_modelspace;
 
-  vec3 lightPos = vec3(0.9,depth,1.05);
-  lightDir = lightPos - vertexPosition_modelspace;
+  depthOG = vertexPosition_modelspace.y;
+  vec3 lightPos1 = vec3(0.3,-2.0,1.05);
+  vec3 lightPos2 = vec3(0.3,-1.0,1.05);
+  vec3 lightPos3 = vec3(0.3,.0,1.05);
+  vec3 lightPos4 = vec3(0.3,1.0,1.05);
+  lightDir1 = lightPos1 - vertexPosition_modelspace;
+  lightDir2 = lightPos2 - vertexPosition_modelspace;
+  lightDir3 = lightPos3 - vertexPosition_modelspace;
+  lightDir4 = lightPos4 - vertexPosition_modelspace;
 
 }
