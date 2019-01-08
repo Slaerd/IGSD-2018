@@ -14,22 +14,13 @@ uniform vec3 camPos;
 
 void main(){
     vec3 white = vec3(1.0,1.0,1.0);
-    vec3 lightDir;
+    vec3 lightDir;                      //Contiendra les directions de nos lumieres
 
-    vec3 ambient = color * 0.3f;
+    vec3 ambient = color * 0.3f; //Composante ambiente assez elevee pour ne pas avoir un resultat trop moche
     vec3 diffuse = vec3(.0,.0,.0);
     vec3 speculaire = vec3(.0,.0,.0);
 
-    /*if(depthOG == -2.0){
-        lightDir = lightDir1;
-    }else if(depthOG == -1.0){
-        lightDir = lightDir2;
-    }else if(depthOG == .0){
-        lightDir = lightDir3;
-    }else{
-        lightDir = lightDir4;
-    }*/
-    vec3 lightPos[4];
+    vec3 lightPos[4];           //On stocke nos lumieres dans un array pour iterer dessus
     lightPos[0] = lightDir1;
     lightPos[1] = lightDir2;
     lightPos[2] = lightDir3;
@@ -37,19 +28,9 @@ void main(){
 
     for(int i = 0; i < 4; i++){
         lightDir = lightPos[i];
-        vec3 lightDirNorm = normalize(lightDir);
+        vec3 lightDirNorm = normalize(lightDir);    //Normalisation pour les produits scalaires
 
-        //vec3 spotMainDir = normalize(vec3(1.0,0.0,1.0));
-        float spotParam = 1;
-        float distanceParam = min(max(0.01, 0.4/dot(lightDir,lightDir)),min(1.0,0.4/dot(lightDir,lightDir)));
-
-        /*if(dot(lightDirNorm,spotMainDir) > 0)
-            spotParam = 1;
-        else
-            spotParam = 0;*/
-
-        float intensity = spotParam * distanceParam;
-        //vec3 lightDirNorm = vec3(1.0,.0,.0);
+        float intensity = max(max(0.1, 0.4/dot(lightDir,lightDir)),min(1.0,0.4/dot(lightDir,lightDir)));
 
         vec3 normalNorm = normalize(normal);
         vec3 camPosNorm = normalize(camPos);
@@ -58,10 +39,9 @@ void main(){
         lightReflect = normalize(lightReflect);
 
         float diffK = max(dot(lightDirNorm,normalNorm),.0);
-        //float diffK = dot(lightDirNorm,normalNorm);
         diffuse += intensity * color * diffK;
 
-        float specK = max(pow(dot(lightReflect,camPosNorm),50),.0);
+        float specK = max(pow(dot(lightReflect,camPosNorm),21),.0);
         speculaire += intensity * white * specK;
     }
 
