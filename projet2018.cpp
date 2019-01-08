@@ -46,6 +46,7 @@ float nbBands = 8.0f;
 
 int N = 4;
 
+//Variables de controle de position des courbes
 int profondeur_min = -2;
 float profondeur_incre = 1.0f;
 int profondeur_A = profondeur_min;
@@ -53,7 +54,6 @@ int profondeur_B = profondeur_min;
 
 int SMOOTHING_VALS = 1;
 int SMOOTHING_VOLS = 1;
-
 
 // gauss function
 float gaussian( float x, float mu, float sigma ) {
@@ -75,17 +75,17 @@ vector<float> smoothData(vector<float> &data, vector<float> &kernel){
   vector<float> smoothdata(data.size());
   vector<float> sums(data.size());
   for (int i = 0; i < data.size(); i++){
-	   int j = i-(kernel.size()-1)/2;
-	   int cpt = 0;
-     float valeur_used = 0;
-     while(j<0){
-       cpt++;
-       j++;
+	   int ptData = i-(kernel.size()-1)/2;
+	   int ptKernel = 0;
+     float valeur_used = 0; //Permet de faire la moyenne
+     while(ptData<0){
+       ptData++;
+       ptKernel++;
      }
-	   while ( j < data.size() && cpt < kernel.size()){
-       sums[i] += kernel[cpt]*data[j];
-		   cpt++;
-       j++;
+	   while ( ptData < data.size() && ptKernel < kernel.size()){
+       sums[i] += kernel[ptKernel]*data[ptData];
+		   ptKernel++;
+       ptData++;
        valeur_used++;
 	   }
      smoothdata[i] = sums[i]/valeur_used;
@@ -112,14 +112,10 @@ void loadData(string filename, vector<float> &vols, vector<float> &vals){
 	  if (cpt==5){
 			if ( minvol > stof(value)) minvol = stof(value);
 			if ( maxvol < stof(value)) maxvol = stof(value);
-			//minval = min(minval, stof(value));
-			//maxval = max(maxval, stof(value));
 			vols.push_back(stof(value));
 		} else if (cpt == 6){
 			if ( minval > stof(value)) minval = stof(value);
 			if ( maxval < stof(value)) maxval = stof(value);
-			//minval = min(minvol, stof(value));
-			//maxval = max(maxvol, stof(value));
 			vals.push_back(stof(value));
 			cpt = 0;
 		}
@@ -238,9 +234,12 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDA){
 	int size_draw = 2*3*3*(N-1);
-  GLfloat g_vertex_buffer_dataA[size_draw];//+4*3*3];
-  GLfloat g_vertex_normal_dataA[(N-1)*3];//+4*3*3];
-  GLfloat g_vertex_color_dataA[size_draw]; //On a besoin de une normale pour deux triangles et donc 3 coordo pour definir cette normale
+
+  GLfloat g_vertex_buffer_dataA[size_draw]; //+ 9 Pour dessiner un triangle de test
+  vector<vec3> g_vertex_normal_faces(N-1); //On a besoin d'une seule normale par rectangle
+  GLfloat g_vertex_normal_dataA[size_draw]; //Ce tableau associe les normales moyennees a chaque point
+  GLfloat g_vertex_color_dataA[size_draw];
+
 
   for(int i=0; i<size_draw; i++){
     g_vertex_buffer_dataA[i] = 0.654321;
@@ -323,8 +322,97 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_color_dataA[18*i + 15] = couleur_R;
 	g_vertex_color_dataA[18*i + 16] = couleur_G;
 	g_vertex_color_dataA[18*i + 17] = couleur_B;
+
+	}
+
+	//Normale de la premiere Face
+  vec3 moyNormal0 = (g_vertex_normal_faces[0] + g_vertex_normal_faces[1])/2.0f; //On fait la moyenne de deux normales pour les points
+                                                                                  //aux intersections de 2 rectangles
+  g_vertex_normal_dataA[0] = g_vertex_normal_faces[0].x; //A
+	g_vertex_normal_dataA[1] = g_vertex_normal_faces[0].y;
+	g_vertex_normal_dataA[2] = g_vertex_normal_faces[0].z;
+
+	g_vertex_normal_dataA[3] = g_vertex_normal_faces[0].x; //B
+	g_vertex_normal_dataA[4] = g_vertex_normal_faces[0].y;
+	g_vertex_normal_dataA[5] = g_vertex_normal_faces[0].z;
+
+	g_vertex_normal_dataA[6] = moyNormal0.x; //C
+	g_vertex_normal_dataA[7] = moyNormal0.y;
+	g_vertex_normal_dataA[8] = moyNormal0.z;
+
+	g_vertex_normal_dataA[9] = g_vertex_normal_faces[0].x; //B
+	g_vertex_normal_dataA[10] = g_vertex_normal_faces[0].y;
+	g_vertex_normal_dataA[11] = g_vertex_normal_faces[0].z;
+
+	g_vertex_normal_dataA[12] = moyNormal0.x; //C
+	g_vertex_normal_dataA[13] = moyNormal0.y;
+	g_vertex_normal_dataA[14] = moyNormal0.z;
+
+	g_vertex_normal_dataA[15] = moyNormal0.x; //D
+	g_vertex_normal_dataA[16] = moyNormal0.y;
+	g_vertex_normal_dataA[17] = moyNormal0.z;
+
+  //Normales pour les faces intermediaires
+  for(int i = 1; i < N-1-1; i++){
+		vec3 moyNormal1 = (g_vertex_normal_faces[i-1] + g_vertex_normal_faces[i])/2.0f;
+		vec3 moyNormal2 = (g_vertex_normal_faces[i] + g_vertex_normal_faces[i+1])/2.0f;
+
+		g_vertex_normal_dataA[18*i + 0] = moyNormal1.x; //A
+		g_vertex_normal_dataA[18*i + 1] = moyNormal1.y;
+		g_vertex_normal_dataA[18*i + 2] = moyNormal1.z;
+
+		g_vertex_normal_dataA[18*i + 3] = moyNormal1.x; //B
+		g_vertex_normal_dataA[18*i + 4] = moyNormal1.y;
+		g_vertex_normal_dataA[18*i + 5] = moyNormal1.z;
+
+		g_vertex_normal_dataA[18*i + 6] = moyNormal2.x; //C
+		g_vertex_normal_dataA[18*i + 7] = moyNormal2.y;
+		g_vertex_normal_dataA[18*i + 8] = moyNormal2.z;
+
+
+		g_vertex_normal_dataA[18*i + 9] = moyNormal1.x; //B
+		g_vertex_normal_dataA[18*i + 10] = moyNormal1.y;
+		g_vertex_normal_dataA[18*i + 11] = moyNormal1.z;
+
+		g_vertex_normal_dataA[18*i + 12] = moyNormal2.x; //C
+		g_vertex_normal_dataA[18*i + 13] = moyNormal2.y;
+		g_vertex_normal_dataA[18*i + 14] = moyNormal2.z;
+
+		g_vertex_normal_dataA[18*i + 15] = moyNormal2.x; //D
+		g_vertex_normal_dataA[18*i + 16] = moyNormal2.y;
+		g_vertex_normal_dataA[18*i + 17] = moyNormal2.z;
   }
-	profondeur_A+=profondeur_incre;
+
+  	//Normale de la derniere face
+
+  	moyNormal0 = (g_vertex_normal_faces[N-1-1] + g_vertex_normal_faces[N-1-2])/2.0f;
+
+  	g_vertex_normal_dataA[18*(N-1) - 18] = moyNormal0.x; //A
+  	g_vertex_normal_dataA[18*(N-1) - 17] = moyNormal0.y;
+  	g_vertex_normal_dataA[18*(N-1) - 16] = moyNormal0.z;
+
+  	g_vertex_normal_dataA[18*(N-1) - 15] = moyNormal0.x; //B
+  	g_vertex_normal_dataA[18*(N-1) - 14] = moyNormal0.y;
+  	g_vertex_normal_dataA[18*(N-1) - 13] = moyNormal0.z;
+
+  	g_vertex_normal_dataA[18*(N-1) - 12] = g_vertex_normal_faces[N-1-1].x; //C
+  	g_vertex_normal_dataA[18*(N-1) - 11] = g_vertex_normal_faces[N-1-1].y;
+  	g_vertex_normal_dataA[18*(N-1) - 10] = g_vertex_normal_faces[N-1-1].z;
+
+
+  	g_vertex_normal_dataA[18*(N-1) - 9] = moyNormal0.x; //B
+  	g_vertex_normal_dataA[18*(N-1) - 8] = moyNormal0.y;
+  	g_vertex_normal_dataA[18*(N-1) - 7] = moyNormal0.z;
+
+  	g_vertex_normal_dataA[18*(N-1) - 6] = g_vertex_normal_faces[N-1-1].x; //C
+  	g_vertex_normal_dataA[18*(N-1) - 5] = g_vertex_normal_faces[N-1-1].y;
+  	g_vertex_normal_dataA[18*(N-1) - 4] = g_vertex_normal_faces[N-1-1].z;
+
+  	g_vertex_normal_dataA[18*(N-1) - 3] = g_vertex_normal_faces[N-1-1].x; //D
+  	g_vertex_normal_dataA[18*(N-1) - 2] = g_vertex_normal_faces[N-1-1].y;
+  	g_vertex_normal_dataA[18*(N-1) - 1] = g_vertex_normal_faces[N-1-1].z;
+
+	profondeur_A+=profondeur_incre; //On separe les courbes en modifiant y
 
   // on teste s'il ne reste pas notre valeur bizarre dans le tableau = on a pas oublie de cases !
   for(int i=0; i<size_draw; i++)
@@ -459,6 +547,8 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
     g_vertex_buffer_dataB[36*i + 34] = rootActExch1+profondeur_B;
     g_vertex_buffer_dataB[36*i + 35] = 0.0f;
   }
+
+  //On fait la fin et le debut
   float distance_max = (N-1)/2000.0;
   float rootActExch0 = sqrt(vecVols[0]);
   float rootActExchmax = sqrt(vecVols[N-1]);
@@ -579,15 +669,16 @@ int main(){
   loadData("data/MSFT.csv",  vols40, vals40);
   N = vals10.size()-3;
 
-  vector<float> kernel = computeGaussianKernel(SMOOTHING_VALS);
-  vector<float> vals10_Smoothed = smoothData(vals10,kernel);
-  vector<float> vals20_Smoothed = smoothData(vals20,kernel);
-  vector<float> vals30_Smoothed = smoothData(vals30,kernel);
-  vector<float> vals40_Smoothed = smoothData(vals40,kernel);
-  vector<float> vols10_Smoothed = smoothData(vols10,kernel);
-  vector<float> vols20_Smoothed = smoothData(vols20,kernel);
-  vector<float> vols30_Smoothed = smoothData(vols30,kernel);
-  vector<float> vols40_Smoothed = smoothData(vols40,kernel);
+  vector<float> kernel_VALS = computeGaussianKernel(SMOOTHING_VALS);
+  vector<float> kernel_VOLS = computeGaussianKernel(SMOOTHING_VOLS);
+  vector<float> vals10_Smoothed = smoothData(vals10,kernel_VALS);
+  vector<float> vals20_Smoothed = smoothData(vals20,kernel_VALS);
+  vector<float> vals30_Smoothed = smoothData(vals30,kernel_VALS);
+  vector<float> vals40_Smoothed = smoothData(vals40,kernel_VALS);
+  vector<float> vols10_Smoothed = smoothData(vols10,kernel_VOLS);
+  vector<float> vols20_Smoothed = smoothData(vols20,kernel_VOLS);
+  vector<float> vols30_Smoothed = smoothData(vols30,kernel_VOLS);
+  vector<float> vols40_Smoothed = smoothData(vols40,kernel_VOLS);
 
   glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // On veut OpenGL 3.3
@@ -659,18 +750,12 @@ int main(){
   GLint  uniform_viewB     = glGetUniformLocation(ProgramB, "viewMatrix");
   GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 
+  GLint uniform_camPos = glGetUniformLocation(ProgramA, "camPos");
+  GLint uniform_normal = glGetUniformLocation(ProgramA, "normalMatrix");
+
   double angle = 0.0;
-  bool Rotate_Sens = false;
   float Incre = 0.01;
-
-
-	float angleRotate_X = 0;
-	float angleRotate_Y = 0;
-	float angleRotate_Z = 0;
-
-	float deca_X = 0;
-	float deca_Y = 0;
-	float deca_Z = 0;
+  float Height = 0.0;
 
   do {
     // clear before every draw
@@ -683,42 +768,27 @@ int main(){
     // onchange de matrice de projection : la projection orthogonale est plus propice a la visualization !
     //glm::mat4 projectionMatrix = glm::perspective(glm::radians(66.0f), 1024.0f / 768.0f, 0.1f, 200.0f);
     glm::mat4 projectionMatrix = glm::ortho( -1.0f, 1.0f, -1.0f, 1.0f, -6.f, 6.f );
-    float camPos[3] = {5*cos(angle)+deca_X, 5*sin(angle), -.5+deca_Z};
+    float camPos[3] = {5*cos(angle), 5*sin(angle), -.5+Height};
     glm::mat4 viewMatrix       = glm::lookAt(
                                   glm::make_vec3(camPos), // where is the camara
                                   vec3(0, 0, 0), //where it looks
                                   vec3(0, 0, 1) // head is up
                                 );
 
-    mat4 rotation_X = glm::mat4(1.0f); //Cree la matrice identite
-	  rotation_X[1][1] = cos(angleRotate_X);
-	  rotation_X[1][2] = -sin(angleRotate_X);
-	  rotation_X[2][1] = sin(angleRotate_X);
-	  rotation_X[2][2] = cos(angleRotate_X);
-
-    mat4 rotation_Y = glm::mat4(1.0f); //Cree la matrice identite
-	  rotation_Y[0][0] = cos(angleRotate_Y);
-	  rotation_Y[0][2] = sin(angleRotate_Y);
-	  rotation_Y[2][0] = -sin(angleRotate_Y);
-	  rotation_Y[2][2] = cos(angleRotate_Y);
-
-    mat4 rotation_Z = glm::mat4(1.0f); //Cree la matrice identite
-	  rotation_Z[0][0] = cos(angleRotate_Z);
-	  rotation_Z[0][1] = -sin(angleRotate_Z);
-	  rotation_Z[1][0] = sin(angleRotate_Z);
-	  rotation_Z[1][1] = cos(angleRotate_Z);
-
     mat4 modelMatrixA     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     modelMatrixA          =  translate(modelMatrixA, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
     mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     modelMatrixB          =  translate(modelMatrixB, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
 
-
+    mat3 normalMatrix = transpose(inverse(viewMatrix * modelMatrixA));
 
     // on envoie les valeurs uniforme aux shaders
     glUniformMatrix4fv(uniform_view,  1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(uniform_projection,1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(uniform_modelA,1, GL_FALSE, glm::value_ptr(modelMatrixA));
+    glUniform3f(uniform_camPos,camPos[0],camPos[1],camPos[2]);
+    glUniformMatrix3fv(uniform_normal,1,GL_FALSE, glm::value_ptr(normalMatrix));
+
 
     // on re-active les VAO avant d'envoyer les buffers
     glBindVertexArray(VertexArrayIDA1);
@@ -761,34 +831,55 @@ int main(){
     glfwSwapBuffers(window);
     glfwPollEvents();
 
-    if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
-      //TODO
-    } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
-      //TODO
-      deca_Z -=0.1;
-    } else if (glfwGetKey(window, GLFW_KEY_R ) == GLFW_PRESS){
-      deca_Z +=0.1;
+    if (glfwGetKey(window, GLFW_KEY_S ) == GLFW_PRESS && Height < 0.5 ){
+      Height += 0.1;
+    } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS && Height > -2.0){
+      Height -= 0.1;
+    } else if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
+      Incre += 0.01;
     } else if (glfwGetKey(window, GLFW_KEY_F ) == GLFW_PRESS){
-      Incre = 0;
-    } else if ( glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS ){
-      if (Rotate_Sens) Incre += -0.001;
-      Rotate_Sens = true;
-    } else if ( glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS ){
-//&& SMOOTHING_VALS<32){
-      if (!Rotate_Sens) Incre += 0.001;
-      Rotate_Sens = false;
+      Incre = 0.0f;
+    } else if ( glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS && SMOOTHING_VOLS>1){
+      SMOOTHING_VOLS--;
+      kernel_VOLS = computeGaussianKernel(SMOOTHING_VOLS);
+      vols10_Smoothed = smoothData(vols10,kernel_VOLS);
+      vols20_Smoothed = smoothData(vols20,kernel_VOLS);
+      vols30_Smoothed = smoothData(vols30,kernel_VOLS);
+      vols40_Smoothed = smoothData(vols40,kernel_VOLS);
+      profondeur_A = profondeur_min;
+      profondeur_B = profondeur_min;
+      m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
+      m12 = loadModelB(vols10_Smoothed, vals10_Smoothed, VertexArrayIDB1);
+      m21 = loadModelA(vols20_Smoothed, vals20_Smoothed, VertexArrayIDA2);
+      m22 = loadModelB(vols20_Smoothed, vals20_Smoothed, VertexArrayIDB2);
+      m31 = loadModelA(vols30_Smoothed, vals30_Smoothed, VertexArrayIDA3);
+      m32 = loadModelB(vols30_Smoothed, vals30_Smoothed, VertexArrayIDB3);
+      m41 = loadModelA(vols40_Smoothed, vals40_Smoothed, VertexArrayIDA4);
+      m42 = loadModelB(vols40_Smoothed, vals40_Smoothed, VertexArrayIDB4);
+    } else if ( glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS && SMOOTHING_VOLS<32){
+      SMOOTHING_VOLS++;
+      kernel_VOLS = computeGaussianKernel(SMOOTHING_VOLS);
+      vols10_Smoothed = smoothData(vols10,kernel_VOLS);
+      vols20_Smoothed = smoothData(vols20,kernel_VOLS);
+      vols30_Smoothed = smoothData(vols30,kernel_VOLS);
+      vols40_Smoothed = smoothData(vols40,kernel_VOLS);
+      profondeur_A = profondeur_min;
+      profondeur_B = profondeur_min;
+      m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
+      m12 = loadModelB(vols10_Smoothed, vals10_Smoothed, VertexArrayIDB1);
+      m21 = loadModelA(vols20_Smoothed, vals20_Smoothed, VertexArrayIDA2);
+      m22 = loadModelB(vols20_Smoothed, vals20_Smoothed, VertexArrayIDB2);
+      m31 = loadModelA(vols30_Smoothed, vals30_Smoothed, VertexArrayIDA3);
+      m32 = loadModelB(vols30_Smoothed, vals30_Smoothed, VertexArrayIDB3);
+      m41 = loadModelA(vols40_Smoothed, vals40_Smoothed, VertexArrayIDA4);
+      m42 = loadModelB(vols40_Smoothed, vals40_Smoothed, VertexArrayIDB4);
     } else if ( glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS && SMOOTHING_VALS>1){
-      //cout << SMOOTHING_VALS << endl;
       SMOOTHING_VALS--;
-      vector<float> kernel = computeGaussianKernel(SMOOTHING_VALS);
-      vector<float> vals10_Smoothed = smoothData(vals10,kernel);
-      vector<float> vals20_Smoothed = smoothData(vals20,kernel);
-      vector<float> vals30_Smoothed = smoothData(vals30,kernel);
-      vector<float> vals40_Smoothed = smoothData(vals40,kernel);
-      vector<float> vols10_Smoothed = smoothData(vols10,kernel);
-      vector<float> vols20_Smoothed = smoothData(vols20,kernel);
-      vector<float> vols30_Smoothed = smoothData(vols30,kernel);
-      vector<float> vols40_Smoothed = smoothData(vols40,kernel);
+      kernel_VALS = computeGaussianKernel(SMOOTHING_VALS);
+      vals10_Smoothed = smoothData(vals10,kernel_VALS);
+      vals20_Smoothed = smoothData(vals20,kernel_VALS);
+      vals30_Smoothed = smoothData(vals30,kernel_VALS);
+      vals40_Smoothed = smoothData(vals40,kernel_VALS);
       profondeur_A = profondeur_min;
       profondeur_B = profondeur_min;
       m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
@@ -800,17 +891,12 @@ int main(){
       m41 = loadModelA(vols40_Smoothed, vals40_Smoothed, VertexArrayIDA4);
       m42 = loadModelB(vols40_Smoothed, vals40_Smoothed, VertexArrayIDB4);
     } else if ( glfwGetKey(window, GLFW_KEY_UP ) == GLFW_PRESS && SMOOTHING_VALS<32){
-      //cout << SMOOTHING_VALS << endl;
       SMOOTHING_VALS++;
-      vector<float> kernel = computeGaussianKernel(SMOOTHING_VALS);
-      vector<float> vals10_Smoothed = smoothData(vals10,kernel);
-      vector<float> vals20_Smoothed = smoothData(vals20,kernel);
-      vector<float> vals30_Smoothed = smoothData(vals30,kernel);
-      vector<float> vals40_Smoothed = smoothData(vals40,kernel);
-      vector<float> vols10_Smoothed = smoothData(vols10,kernel);
-      vector<float> vols20_Smoothed = smoothData(vols20,kernel);
-      vector<float> vols30_Smoothed = smoothData(vols30,kernel);
-      vector<float> vols40_Smoothed = smoothData(vols40,kernel);
+      kernel_VALS = computeGaussianKernel(SMOOTHING_VALS);
+      vals10_Smoothed = smoothData(vals10,kernel_VALS);
+      vals20_Smoothed = smoothData(vals20,kernel_VALS);
+      vals30_Smoothed = smoothData(vals30,kernel_VALS);
+      vals40_Smoothed = smoothData(vals40,kernel_VALS);
       profondeur_A = profondeur_min;
       profondeur_B = profondeur_min;
       m11 = loadModelA(vols10_Smoothed, vals10_Smoothed, VertexArrayIDA1);
