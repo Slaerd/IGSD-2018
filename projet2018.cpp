@@ -237,10 +237,12 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDA){
 	int size_draw = 2*3*3*(N-1);
+  
   GLfloat g_vertex_buffer_dataA[size_draw]; //+ 9 Pour dessiner un triangle de test
   vector<vec3> g_vertex_normal_faces(N-1); //On a besoin d'une seule normale par rectangle
   GLfloat g_vertex_normal_dataA[size_draw]; //Ce tableau associe les normales moyennees a chaque point
   GLfloat g_vertex_color_dataA[size_draw];
+
 
   for(int i=0; i<size_draw; i++){
     g_vertex_buffer_dataA[i] = 0.654321;
@@ -256,13 +258,11 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
 	else couleur_G = 1.0f;
 
-	float distance = i/(float) (N-1);
-  float distance1 = (i+1)/(float) (N-1);
+	float distance = i/2000.0;
+  float distance1 = (i+1)/2000.0;
 
-	float rootActExch = glm::sqrt(vecVols[i]);
-	float rootActExch1 = glm::sqrt(vecVols[i+1]);
-
-  //Triangle 1
+	float rootActExch = sqrt(vecVols[i]);
+	float rootActExch1 = sqrt(vecVols[i+1]);
 
 	g_vertex_buffer_dataA[18*i + 0] = distance; //A
 	g_vertex_buffer_dataA[18*i + 1] = 0.0f+profondeur_A;
@@ -276,8 +276,6 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_buffer_dataA[18*i + 7] = 0.0f+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 8] = vecVals[i+1];
 
-  //Triangle 2
-
 	g_vertex_buffer_dataA[18*i + 9] = distance; //B
 	g_vertex_buffer_dataA[18*i + 10] = rootActExch+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 11] = vecVals[i];
@@ -290,17 +288,19 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_buffer_dataA[18*i + 16] = rootActExch1+profondeur_A;
 	g_vertex_buffer_dataA[18*i + 17] = vecVals[i+1];
 
-  //On recupere deux vecteurs d'une meme face
-	vec3 V1 = vec3(	g_vertex_buffer_dataA[18*i + 6] - g_vertex_buffer_dataA[18*i + 0],
-					g_vertex_buffer_dataA[18*i + 7] - g_vertex_buffer_dataA[18*i + 1],
-					g_vertex_buffer_dataA[18*i + 8] - g_vertex_buffer_dataA[18*i + 2]
-					);
-	vec3 V2 = vec3(	g_vertex_buffer_dataA[18*i + 9] - g_vertex_buffer_dataA[18*i + 0],
-					g_vertex_buffer_dataA[18*i + 10] - g_vertex_buffer_dataA[18*i + 1],
-					g_vertex_buffer_dataA[18*i + 11] - g_vertex_buffer_dataA[18*i + 2]);
+	float AC[3];
+	AC[0] = g_vertex_buffer_dataA[18*i + 6] - g_vertex_buffer_dataA[18*i + 0];
+	AC[1] = g_vertex_buffer_dataA[18*i + 7] - g_vertex_buffer_dataA[18*i + 1];
+	AC[2] = g_vertex_buffer_dataA[18*i + 8] - g_vertex_buffer_dataA[18*i + 2];
 
-  //Le produit vectoriel nous donne la normale
-	g_vertex_normal_faces[i] = normalize(cross(V1,V2));
+	float AB[3];
+	AB[0] = g_vertex_buffer_dataA[18*i + 9] - g_vertex_buffer_dataA[18*i + 0];
+	AB[1] = g_vertex_buffer_dataA[18*i + 10] - g_vertex_buffer_dataA[18*i + 1];
+	AB[2] = g_vertex_buffer_dataA[18*i + 11] - g_vertex_buffer_dataA[18*i + 2];
+	//On fait AC*AB
+	g_vertex_normal_dataA[3*i + 0] = (AC[1]*AB[2]) - (AC[2]*AB[1]);
+	g_vertex_normal_dataA[3*i + 1] = (AC[0]*AB[2]) - (AC[2]*AB[0]);
+	g_vertex_normal_dataA[3*i + 2] = (AC[0]*AB[1]) - (AC[1]*AB[0]);
 
     /*g_vertex_color_dataA[18*i + 0] = 1.0f;
 	g_vertex_color_dataA[18*i + 1] = .0;
@@ -371,7 +371,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 }*/
 
 	//Normale de la premiere Face
-    vec3 moyNormal0 = (g_vertex_normal_faces[0] + g_vertex_normal_faces[1])/2.0f; //On fait la moyenne de deux normales pour les points
+  vec3 moyNormal0 = (g_vertex_normal_faces[0] + g_vertex_normal_faces[1])/2.0f; //On fait la moyenne de deux normales pour les points
                                                                                   //aux intersections de 2 rectangles
   g_vertex_normal_dataA[0] = g_vertex_normal_faces[0].x; //A
 	g_vertex_normal_dataA[1] = g_vertex_normal_faces[0].y;
@@ -503,8 +503,7 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
       GL_FLOAT,
       GL_FALSE,
       0,
-      (void*)sizeof(g_vertex_buffer_dataA)
-    );
+      (void*)sizeof(g_vertex_buffer_dataA));
     glEnableVertexAttribArray(1);
 
     glVertexAttribPointer( // same thing for the normals
@@ -513,9 +512,9 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
       GL_FLOAT,
       GL_FALSE,
       0,
-      (void*)(sizeof(g_vertex_buffer_dataA)+sizeof(g_vertex_color_dataA))
-    );
+      (void*)(sizeof(g_vertex_buffer_dataA)+sizeof(g_vertex_color_dataA)));
     glEnableVertexAttribArray(2);
+
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -539,8 +538,8 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
   // on rajoute des faces et de la hauteur a notre figure
   for (int i=0; i<N-1; i++){
-	  float distance = i/(float) (N-1);
-	  float distance1 = (i+1)/(float) (N-1);
+	  float distance = i/2000.0;
+	  float distance1 = (i+1)/2000.0;
 
     float rootActExch = sqrt(vecVols[i]);
 	  float rootActExch1 = sqrt(vecVols[i+1]);
@@ -593,7 +592,7 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
     g_vertex_buffer_dataB[36*i + 34] = rootActExch1+profondeur_B;
     g_vertex_buffer_dataB[36*i + 35] = 0.0f;
   }
-  float distance_max = (N-1)/(float) (N-1);
+  float distance_max = (N-1)/2000.0;
   float rootActExch0 = sqrt(vecVols[0]);
   float rootActExchmax = sqrt(vecVols[N-1]);
 
@@ -644,7 +643,6 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   g_vertex_buffer_dataB[size_draw+33] = distance_max;
   g_vertex_buffer_dataB[size_draw+34] = rootActExchmax+profondeur_B;
   g_vertex_buffer_dataB[size_draw+35] = vecVals[N-1];
-
 
   profondeur_B+=profondeur_incre;
   // ???
@@ -749,8 +747,6 @@ int main(){
 
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // Accept fragment if it closer to the camera than the former one
   glDepthFunc(GL_LESS);
@@ -798,8 +794,7 @@ int main(){
 
   GLint uniform_camPos = glGetUniformLocation(ProgramA, "camPos");
   GLint uniform_normal = glGetUniformLocation(ProgramA, "normalMatrix");
-
-
+  
   double angle = 0.0;
   bool Rotate_Sens = false;
   float Incre = 0.01;
@@ -820,12 +815,11 @@ int main(){
 
     // Use our shader program
     glUseProgram(ProgramA);
-    //angle += Incre;
+    angle += Incre;
     // onchange de matrice de projection : la projection orthogonale est plus propice a la visualization !
     //glm::mat4 projectionMatrix = glm::perspective(glm::radians(66.0f), 1024.0f / 768.0f, 0.1f, 200.0f);
     glm::mat4 projectionMatrix = glm::ortho( -1.0f, 1.0f, -1.0f, 1.0f, -6.f, 6.f );
     float camPos[3] = {5*cos(angle)+deca_X, 5*sin(angle), -.5+deca_Z};
-    //vec3 viewVec = vec3(5*cos(angle)+deca_X, 5*sin(angle), -.5+deca_Z);
     glm::mat4 viewMatrix       = glm::lookAt(
                                   glm::make_vec3(camPos), // where is the camara
                                   vec3(0, 0, 0), //where it looks
@@ -864,6 +858,7 @@ int main(){
     glUniform3f(uniform_camPos,camPos[0],camPos[1],camPos[2]);
     glUniformMatrix3fv(uniform_normal,1,GL_FALSE, glm::value_ptr(normalMatrix));
 
+
     // on re-active les VAO avant d'envoyer les buffers
     glBindVertexArray(VertexArrayIDA1);
     glDrawArrays(GL_TRIANGLES, 0, m11);
@@ -876,6 +871,7 @@ int main(){
 
     glBindVertexArray(VertexArrayIDA4);
     glDrawArrays(GL_TRIANGLES, 0, m41);
+
 
     glUseProgram(ProgramB);
     glUniformMatrix4fv(uniform_viewB,  1, GL_FALSE, glm::value_ptr(viewMatrix));
