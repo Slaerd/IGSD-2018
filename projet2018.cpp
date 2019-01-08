@@ -354,20 +354,25 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
   //TEST TRIANGLE
 
-  /*g_vertex_buffer_dataA[size_draw + 0] = 1;
+  /*g_vertex_buffer_dataA[size_draw + 0] = 0;
   g_vertex_buffer_dataA[size_draw + 1] = profondeur_A;
-  g_vertex_buffer_dataA[size_draw + 2] = 1 - 0.1;
-  g_vertex_buffer_dataA[size_draw + 3] = 1;
+  g_vertex_buffer_dataA[size_draw + 2] = 1 - 0.2;
+  g_vertex_buffer_dataA[size_draw + 3] = 0;
   g_vertex_buffer_dataA[size_draw + 4] = profondeur_A;
-  g_vertex_buffer_dataA[size_draw + 5] = 1 + 0.1;
-  g_vertex_buffer_dataA[size_draw + 6] = 0;
+  g_vertex_buffer_dataA[size_draw + 5] = 1 + 0.2;
+  g_vertex_buffer_dataA[size_draw + 6] = 1;
   g_vertex_buffer_dataA[size_draw + 7] = profondeur_A;
   g_vertex_buffer_dataA[size_draw + 8] = 1;
 
   for(int i = 0; i < 9; i += 3){
     g_vertex_color_dataA[size_draw + i] = 0.0f;
-    g_vertex_color_dataA[size_draw + i + 1] = 0.0f;
-    g_vertex_color_dataA[size_draw + i + 2] = 1.0f;
+    g_vertex_color_dataA[size_draw + i + 1] = 1.0f;
+    g_vertex_color_dataA[size_draw + i + 2] = 0.0f;
+    if(i%3 == 2){
+        g_vertex_color_dataA[size_draw + i] = 0.0f;
+        g_vertex_color_dataA[size_draw + i + 1] = 0.0f;
+        g_vertex_color_dataA[size_draw + i + 2] = 1.0f;
+    }
 }*/
 
 	//Normale de la premiere Face

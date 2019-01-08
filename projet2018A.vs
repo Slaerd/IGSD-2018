@@ -32,10 +32,10 @@ void main(){
   normal = vertexNormal_modelspace;
 
   depthOG = vertexPosition_modelspace.y;
-  vec3 lightPos1 = vec3(0.3,-2.0,1.05);
-  vec3 lightPos2 = vec3(0.3,-1.0,1.05);
-  vec3 lightPos3 = vec3(0.3,.0,1.05);
-  vec3 lightPos4 = vec3(0.3,1.0,1.05);
+  vec3 lightPos1 = vec3(.2,-2.0,1.2);
+  vec3 lightPos2 = vec3(.2,-1.0,1.2);
+  vec3 lightPos3 = vec3(.2,.0,1.2);
+  vec3 lightPos4 = vec3(.2,1.0,1.2);
   lightDir1 = lightPos1 - vertexPosition_modelspace;
   lightDir2 = lightPos2 - vertexPosition_modelspace;
   lightDir3 = lightPos3 - vertexPosition_modelspace;

@@ -16,7 +16,7 @@ void main(){
     vec3 white = vec3(1.0,1.0,1.0);
     vec3 lightDir;
 
-    vec3 ambient = color * 0.2f;
+    vec3 ambient = color * 0.3f;
     vec3 diffuse = vec3(.0,.0,.0);
     vec3 speculaire = vec3(.0,.0,.0);
 
@@ -41,7 +41,7 @@ void main(){
 
         //vec3 spotMainDir = normalize(vec3(1.0,0.0,1.0));
         float spotParam = 1;
-        float distanceParam = min(max(0.01, 0.5/dot(lightDir,lightDir)),min(1.0,0.5/dot(lightDir,lightDir)));
+        float distanceParam = min(max(0.01, 0.4/dot(lightDir,lightDir)),min(1.0,0.4/dot(lightDir,lightDir)));
 
         /*if(dot(lightDirNorm,spotMainDir) > 0)
             spotParam = 1;
@@ -57,15 +57,15 @@ void main(){
         vec3 lightReflect = 2 * dot(normalNorm,lightDirNorm) * normalNorm - lightDirNorm; //Vecteur qui dirige la lumiere refletee
         lightReflect = normalize(lightReflect);
 
-        //float diffK = max(dot(lightDirNorm,normalNorm),.0);
-        float diffK = dot(lightDirNorm,normalNorm);
+        float diffK = max(dot(lightDirNorm,normalNorm),.0);
+        //float diffK = dot(lightDirNorm,normalNorm);
         diffuse += intensity * color * diffK;
 
-        float specK = max(pow(dot(lightReflect,camPosNorm),201),.0);
+        float specK = max(pow(dot(lightReflect,camPosNorm),50),.0);
         speculaire += intensity * white * specK;
     }
 
-    coloro = vec4(diffuse,1.0f);
+    coloro = vec4(ambient + diffuse + speculaire,1.0f);
 
     gl_FragDepth    = 1.0-depth/10.0;
 }
