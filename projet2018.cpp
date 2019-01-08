@@ -54,7 +54,6 @@ int profondeur_B = profondeur_min;
 int SMOOTHING_VALS = 1;
 int SMOOTHING_VOLS = 1;
 
-
 // gauss function
 float gaussian( float x, float mu, float sigma ) {
   const float a = ( x - mu ) / sigma;
@@ -238,9 +237,12 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDA){
 	int size_draw = 2*3*3*(N-1);
-  GLfloat g_vertex_buffer_dataA[size_draw];//+4*3*3];
-  GLfloat g_vertex_normal_dataA[(N-1)*3];//+4*3*3];
-  GLfloat g_vertex_color_dataA[size_draw]; //On a besoin de une normale pour deux triangles et donc 3 coordo pour definir cette normale
+  
+  GLfloat g_vertex_buffer_dataA[size_draw]; //+ 9 Pour dessiner un triangle de test
+  vector<vec3> g_vertex_normal_faces(N-1); //On a besoin d'une seule normale par rectangle
+  GLfloat g_vertex_normal_dataA[size_draw]; //Ce tableau associe les normales moyennees a chaque point
+  GLfloat g_vertex_color_dataA[size_draw];
+
 
   for(int i=0; i<size_draw; i++){
     g_vertex_buffer_dataA[i] = 0.654321;
@@ -300,6 +302,30 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_normal_dataA[3*i + 1] = (AC[0]*AB[2]) - (AC[2]*AB[0]);
 	g_vertex_normal_dataA[3*i + 2] = (AC[0]*AB[1]) - (AC[1]*AB[0]);
 
+    /*g_vertex_color_dataA[18*i + 0] = 1.0f;
+	g_vertex_color_dataA[18*i + 1] = .0;
+	g_vertex_color_dataA[18*i + 2] = .0;
+
+	g_vertex_color_dataA[18*i + 3] = 1.0f;
+	g_vertex_color_dataA[18*i + 4] = .0;
+	g_vertex_color_dataA[18*i + 5] = .0;
+
+	g_vertex_color_dataA[18*i + 6] = .0;
+	g_vertex_color_dataA[18*i + 7] = .0;
+	g_vertex_color_dataA[18*i + 8] = 1.0f;
+
+	g_vertex_color_dataA[18*i + 9] = 1.0f;
+	g_vertex_color_dataA[18*i + 10] = .0;
+	g_vertex_color_dataA[18*i + 11] = .0;
+
+	g_vertex_color_dataA[18*i + 12] = .0;
+	g_vertex_color_dataA[18*i + 13] = .0;
+	g_vertex_color_dataA[18*i + 14] = 1.0f;
+
+	g_vertex_color_dataA[18*i + 15] = 1.0f;
+	g_vertex_color_dataA[18*i + 16] = .0;
+	g_vertex_color_dataA[18*i + 17] = .0;*/
+
 	g_vertex_color_dataA[18*i + 0] = couleur_R;
 	g_vertex_color_dataA[18*i + 1] = couleur_G;
 	g_vertex_color_dataA[18*i + 2] = couleur_B;
@@ -323,8 +349,115 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 	g_vertex_color_dataA[18*i + 15] = couleur_R;
 	g_vertex_color_dataA[18*i + 16] = couleur_G;
 	g_vertex_color_dataA[18*i + 17] = couleur_B;
+
+	}
+
+  //TEST TRIANGLE
+
+  /*g_vertex_buffer_dataA[size_draw + 0] = 1;
+  g_vertex_buffer_dataA[size_draw + 1] = profondeur_A;
+  g_vertex_buffer_dataA[size_draw + 2] = 1 - 0.1;
+  g_vertex_buffer_dataA[size_draw + 3] = 1;
+  g_vertex_buffer_dataA[size_draw + 4] = profondeur_A;
+  g_vertex_buffer_dataA[size_draw + 5] = 1 + 0.1;
+  g_vertex_buffer_dataA[size_draw + 6] = 0;
+  g_vertex_buffer_dataA[size_draw + 7] = profondeur_A;
+  g_vertex_buffer_dataA[size_draw + 8] = 1;
+
+  for(int i = 0; i < 9; i += 3){
+    g_vertex_color_dataA[size_draw + i] = 0.0f;
+    g_vertex_color_dataA[size_draw + i + 1] = 0.0f;
+    g_vertex_color_dataA[size_draw + i + 2] = 1.0f;
+}*/
+
+	//Normale de la premiere Face
+  vec3 moyNormal0 = (g_vertex_normal_faces[0] + g_vertex_normal_faces[1])/2.0f; //On fait la moyenne de deux normales pour les points
+                                                                                  //aux intersections de 2 rectangles
+  g_vertex_normal_dataA[0] = g_vertex_normal_faces[0].x; //A
+	g_vertex_normal_dataA[1] = g_vertex_normal_faces[0].y;
+	g_vertex_normal_dataA[2] = g_vertex_normal_faces[0].z;
+
+	g_vertex_normal_dataA[3] = g_vertex_normal_faces[0].x; //B
+	g_vertex_normal_dataA[4] = g_vertex_normal_faces[0].y;
+	g_vertex_normal_dataA[5] = g_vertex_normal_faces[0].z;
+
+	g_vertex_normal_dataA[6] = moyNormal0.x; //C
+	g_vertex_normal_dataA[7] = moyNormal0.y;
+	g_vertex_normal_dataA[8] = moyNormal0.z;
+
+	g_vertex_normal_dataA[9] = g_vertex_normal_faces[0].x; //B
+	g_vertex_normal_dataA[10] = g_vertex_normal_faces[0].y;
+	g_vertex_normal_dataA[11] = g_vertex_normal_faces[0].z;
+
+	g_vertex_normal_dataA[12] = moyNormal0.x; //C
+	g_vertex_normal_dataA[13] = moyNormal0.y;
+	g_vertex_normal_dataA[14] = moyNormal0.z;
+
+	g_vertex_normal_dataA[15] = moyNormal0.x; //D
+	g_vertex_normal_dataA[16] = moyNormal0.y;
+	g_vertex_normal_dataA[17] = moyNormal0.z;
+
+  //Normales pour les faces intermediaires
+  for(int i = 1; i < N-1-1; i++){
+		vec3 moyNormal1 = (g_vertex_normal_faces[i-1] + g_vertex_normal_faces[i])/2.0f;
+		vec3 moyNormal2 = (g_vertex_normal_faces[i] + g_vertex_normal_faces[i+1])/2.0f;
+
+		g_vertex_normal_dataA[18*i + 0] = moyNormal1.x; //A
+		g_vertex_normal_dataA[18*i + 1] = moyNormal1.y;
+		g_vertex_normal_dataA[18*i + 2] = moyNormal1.z;
+
+		g_vertex_normal_dataA[18*i + 3] = moyNormal1.x; //B
+		g_vertex_normal_dataA[18*i + 4] = moyNormal1.y;
+		g_vertex_normal_dataA[18*i + 5] = moyNormal1.z;
+
+		g_vertex_normal_dataA[18*i + 6] = moyNormal2.x; //C
+		g_vertex_normal_dataA[18*i + 7] = moyNormal2.y;
+		g_vertex_normal_dataA[18*i + 8] = moyNormal2.z;
+
+
+		g_vertex_normal_dataA[18*i + 9] = moyNormal1.x; //B
+		g_vertex_normal_dataA[18*i + 10] = moyNormal1.y;
+		g_vertex_normal_dataA[18*i + 11] = moyNormal1.z;
+
+		g_vertex_normal_dataA[18*i + 12] = moyNormal2.x; //C
+		g_vertex_normal_dataA[18*i + 13] = moyNormal2.y;
+		g_vertex_normal_dataA[18*i + 14] = moyNormal2.z;
+
+		g_vertex_normal_dataA[18*i + 15] = moyNormal2.x; //D
+		g_vertex_normal_dataA[18*i + 16] = moyNormal2.y;
+		g_vertex_normal_dataA[18*i + 17] = moyNormal2.z;
   }
-	profondeur_A+=profondeur_incre;
+
+  	//Normale de la derniere face
+
+  	moyNormal0 = (g_vertex_normal_faces[N-1-1] + g_vertex_normal_faces[N-1-2])/2.0f;
+
+  	g_vertex_normal_dataA[18*(N-1) - 18] = moyNormal0.x; //A
+  	g_vertex_normal_dataA[18*(N-1) - 17] = moyNormal0.y;
+  	g_vertex_normal_dataA[18*(N-1) - 16] = moyNormal0.z;
+
+  	g_vertex_normal_dataA[18*(N-1) - 15] = moyNormal0.x; //B
+  	g_vertex_normal_dataA[18*(N-1) - 14] = moyNormal0.y;
+  	g_vertex_normal_dataA[18*(N-1) - 13] = moyNormal0.z;
+
+  	g_vertex_normal_dataA[18*(N-1) - 12] = g_vertex_normal_faces[N-1-1].x; //C
+  	g_vertex_normal_dataA[18*(N-1) - 11] = g_vertex_normal_faces[N-1-1].y;
+  	g_vertex_normal_dataA[18*(N-1) - 10] = g_vertex_normal_faces[N-1-1].z;
+
+
+  	g_vertex_normal_dataA[18*(N-1) - 9] = moyNormal0.x; //B
+  	g_vertex_normal_dataA[18*(N-1) - 8] = moyNormal0.y;
+  	g_vertex_normal_dataA[18*(N-1) - 7] = moyNormal0.z;
+
+  	g_vertex_normal_dataA[18*(N-1) - 6] = g_vertex_normal_faces[N-1-1].x; //C
+  	g_vertex_normal_dataA[18*(N-1) - 5] = g_vertex_normal_faces[N-1-1].y;
+  	g_vertex_normal_dataA[18*(N-1) - 4] = g_vertex_normal_faces[N-1-1].z;
+
+  	g_vertex_normal_dataA[18*(N-1) - 3] = g_vertex_normal_faces[N-1-1].x; //D
+  	g_vertex_normal_dataA[18*(N-1) - 2] = g_vertex_normal_faces[N-1-1].y;
+  	g_vertex_normal_dataA[18*(N-1) - 1] = g_vertex_normal_faces[N-1-1].z;
+
+	profondeur_A+=profondeur_incre; //On separe les courbes en modifiant y
 
   // on teste s'il ne reste pas notre valeur bizarre dans le tableau = on a pas oublie de cases !
   for(int i=0; i<size_draw; i++)
@@ -659,6 +792,9 @@ int main(){
   GLint  uniform_viewB     = glGetUniformLocation(ProgramB, "viewMatrix");
   GLint uniform_modelB	= glGetUniformLocation(ProgramB, "modelMatrixB");
 
+  GLint uniform_camPos = glGetUniformLocation(ProgramA, "camPos");
+  GLint uniform_normal = glGetUniformLocation(ProgramA, "normalMatrix");
+  
   double angle = 0.0;
   bool Rotate_Sens = false;
   float Incre = 0.01;
@@ -713,12 +849,15 @@ int main(){
     mat4 modelMatrixB     =  scale(glm::mat4(1.0f), glm::vec3(0.75f));
     modelMatrixB          =  translate(modelMatrixB, glm::vec3(0.0f, 0.3f, 0.0f)) * scale(glm::mat4(1.0f), glm::vec3(0.75f));
 
-
+    mat3 normalMatrix = transpose(inverse(viewMatrix * modelMatrixA));
 
     // on envoie les valeurs uniforme aux shaders
     glUniformMatrix4fv(uniform_view,  1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(uniform_projection,1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(uniform_modelA,1, GL_FALSE, glm::value_ptr(modelMatrixA));
+    glUniform3f(uniform_camPos,camPos[0],camPos[1],camPos[2]);
+    glUniformMatrix3fv(uniform_normal,1,GL_FALSE, glm::value_ptr(normalMatrix));
+
 
     // on re-active les VAO avant d'envoyer les buffers
     glBindVertexArray(VertexArrayIDA1);
@@ -761,15 +900,15 @@ int main(){
     glfwSwapBuffers(window);
     glfwPollEvents();
 
-    if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
-      //TODO
+    if (glfwGetKey(window, GLFW_KEY_S ) == GLFW_PRESS){
+      angle += 0.1f;
     } else if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
       //TODO
       deca_Z -=0.1;
-    } else if (glfwGetKey(window, GLFW_KEY_R ) == GLFW_PRESS){
+    } else if (glfwGetKey(window, GLFW_KEY_E ) == GLFW_PRESS){
       deca_Z +=0.1;
     } else if (glfwGetKey(window, GLFW_KEY_F ) == GLFW_PRESS){
-      Incre = 0;
+    angle += -0.1f;
     } else if ( glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS ){
       if (Rotate_Sens) Incre += -0.001;
       Rotate_Sens = true;
