@@ -235,7 +235,7 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArrayIDA){
 
 	int size_draw = 2*3*3*(N-1);
-  
+
   GLfloat g_vertex_buffer_dataA[size_draw]; //+ 9 Pour dessiner un triangle de test
   vector<vec3> g_vertex_normal_faces(N-1); //On a besoin d'une seule normale par rectangle
   GLfloat g_vertex_normal_dataA[size_draw]; //Ce tableau associe les normales moyennees a chaque point
@@ -256,8 +256,8 @@ int loadModelA(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
 	else couleur_G = 1.0f;
 
-	float distance = i/2000.0;
-  float distance1 = (i+1)/2000.0;
+	float distance = i/(float)(N-1);
+  float distance1 = (i+1)/(float)(N-1);
 
     //Triangle 1
 
@@ -520,8 +520,8 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
 
   // on rajoute des faces et de la hauteur a notre figure
   for (int i=0; i<N-1; i++){
-	  float distance = i/2000.0;
-	  float distance1 = (i+1)/2000.0;
+	  float distance = i/(float)(N-1);
+	  float distance1 = (i+1)/(float)(N-1);
 
     float rootActExch = sqrt(vecVols[i]);
 	  float rootActExch1 = sqrt(vecVols[i+1]);
@@ -576,7 +576,7 @@ int loadModelB(vector<float> &vecVols, vector<float> &vecVals, GLuint VertexArra
   }
 
   //On fait la fin et le debut
-  float distance_max = (N-1)/2000.0;
+  float distance_max = 1;
   float rootActExch0 = sqrt(vecVols[0]);
   float rootActExchmax = sqrt(vecVols[N-1]);
 
@@ -792,7 +792,7 @@ int main(){
     // onchange de matrice de projection : la projection orthogonale est plus propice a la visualization !
     //glm::mat4 projectionMatrix = glm::perspective(glm::radians(66.0f), 1024.0f / 768.0f, 0.1f, 200.0f);
     glm::mat4 projectionMatrix = glm::ortho( -1.0f, 1.0f, -1.0f, 1.0f, -6.f, 6.f );
-    
+
     float camPos[3] = {2.5*cos(angle), 2.5*sin(angle), -.5+Height};
 
     glm::mat4 viewMatrix       = glm::lookAt(
